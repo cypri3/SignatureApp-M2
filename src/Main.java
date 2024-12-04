@@ -2,7 +2,7 @@ import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 import java.security.MessageDigest;
-
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class Main {

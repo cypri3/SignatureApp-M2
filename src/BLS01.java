@@ -14,16 +14,13 @@ public class BLS01 {
     public BLS01() {
     }
 
-    public BLS01Parameters setup() {
+    public AsymmetricCipherKeyPair keyGen() {
+
         BLS01ParametersGenerator setup = new BLS01ParametersGenerator();
         setup.init(PairingFactory.getPairingParameters("src/a.properties"));
 
-        return setup.generateParameters();
-    }
-
-    public AsymmetricCipherKeyPair keyGen(BLS01Parameters parameters) {
         BLS01KeyPairGenerator keyGen = new BLS01KeyPairGenerator();
-        keyGen.init(new BLS01KeyGenerationParameters(null, parameters));
+        keyGen.init(new BLS01KeyGenerationParameters(null, setup.generateParameters()));
 
         return keyGen.generateKeyPair();
     }
@@ -58,7 +55,7 @@ public class BLS01 {
         BLS01 bls01 = new BLS01();
 
         // Setup
-        AsymmetricCipherKeyPair keyPair = bls01.keyGen(bls01.setup());
+        AsymmetricCipherKeyPair keyPair = bls01.keyGen();
 
         // Test same message
         String message = "Hello World!";
