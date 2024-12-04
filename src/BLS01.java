@@ -62,7 +62,8 @@ public class BLS01 {
 
         // Test same message
         String message = "Hello World!";
-        boolean isSameMessageValid = bls01.verify(bls01.sign(message, keyPair.getPrivate()), message, keyPair.getPublic());
+        boolean isSameMessageValid = bls01.verify(bls01.sign(message, keyPair.getPrivate()), message,
+                keyPair.getPublic());
         if (isSameMessageValid) {
             System.out.println("Verification for the same message passed.");
         } else {
@@ -70,7 +71,8 @@ public class BLS01 {
         }
 
         // Test different messages
-        boolean isDifferentMessageValid = bls01.verify(bls01.sign(message, keyPair.getPrivate()), "Hello Italy!", keyPair.getPublic());
+        boolean isDifferentMessageValid = bls01.verify(bls01.sign(message, keyPair.getPrivate()), "Hello Italy!",
+                keyPair.getPublic());
         if (!isDifferentMessageValid) {
             System.out.println("Verification for different messages passed.");
         } else {
