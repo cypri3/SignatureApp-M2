@@ -7,40 +7,39 @@ import java.util.Scanner;
 
 public class Hash {
 
-    static byte[] SHA1(String message) throws NoSuchAlgorithmException{
+    static byte[] SHA1(byte[] message) throws NoSuchAlgorithmException{
             
         MessageDigest messageHash = MessageDigest.getInstance("SHA-1");
-        messageHash.update(message.getBytes());
+        messageHash.update(message);
         byte[] hash = messageHash.digest();
         
         return hash;
         }
     
-    static byte[] SHA256(String message) throws NoSuchAlgorithmException{
+    static byte[] SHA256(byte[] message) throws NoSuchAlgorithmException{
             
         MessageDigest messageHash = MessageDigest.getInstance("SHA-256");
-        messageHash.update(message.getBytes());
+        messageHash.update(message);
         byte[] hash = messageHash.digest();
         
         return hash;
         }
 
-    static byte[] MD5(String message) throws NoSuchAlgorithmException{
+    static byte[] MD5(byte[] message) throws NoSuchAlgorithmException{
             
         MessageDigest messageHash = MessageDigest.getInstance("MD5");
-        messageHash.update(message.getBytes());
+        messageHash.update(message);
         byte[] hash = messageHash.digest();
 
         return hash;
         }
     
-    static BigInteger intToHex(String stringHex){
+    static BigInteger bigIntToHex(String stringHex){
         BigInteger integerHex = new BigInteger(stringHex ,16);
         return integerHex;
         }
 
-    static String hexToInt(BigInteger integer){
-        System.out.println("Integer Value :" + integer);
+    static String hexToBigInt(BigInteger integer){
         int integerHex = integer.intValue();
         String stringHex=Integer.toHexString(integerHex);
         return stringHex;
@@ -52,19 +51,20 @@ public class Hash {
         Scanner scan1 = new Scanner(System.in);
         String action=scan1.next();
         String message = "HelloWorld";
+        byte[] messByte = message.getBytes();
             switch(action){
                 case "o" -> {
-                    byte[] defaultHash = SHA1(message);
+                    byte[] defaultHash = SHA1(messByte);
                     System.out.println(Arrays.toString(defaultHash));
                     break;
                 }
                 case "t" -> {
-                    byte[] defaultHash = SHA256(message);
+                    byte[] defaultHash = SHA256(messByte);
                     System.out.println(Arrays.toString(defaultHash));
                     break;
                 }
                 case "m" -> {
-                    byte[] defaultHash = MD5(message);
+                    byte[] defaultHash = MD5(messByte);
                     System.out.println(Arrays.toString(defaultHash));
                     break;
                 }
@@ -74,11 +74,11 @@ public class Hash {
                     break;
                 }
                 case "a" -> {
-                    byte[] defaultHash1 = SHA1(message);
+                    byte[] defaultHash1 = SHA1(messByte);
                     System.out.println(Arrays.toString(defaultHash1));
-                    byte[] defaultHash2 = SHA256(message);
+                    byte[] defaultHash2 = SHA256(messByte);
                     System.out.println(Arrays.toString(defaultHash2));
-                    byte[] defaultHash3 = MD5(message);
+                    byte[] defaultHash3 = MD5(messByte);
                     System.out.println(Arrays.toString(defaultHash3));
                     byte[] defaultHash = BigInteger.valueOf(message.hashCode()).toByteArray();
                     System.out.println(Arrays.toString(defaultHash));
@@ -86,9 +86,9 @@ public class Hash {
                 }
                 case "!" -> {
                     String hexValue = "FFF";
-                    BigInteger intValue = intToHex(hexValue);
+                    BigInteger intValue = bigIntToHex(hexValue);
                     System.out.println("Integer Value : " + intValue);
-                    String valueHex = hexToInt(intValue);
+                    String valueHex = hexToBigInt(intValue);
                     System.out.println(valueHex);
                 }
                 default -> System.out.println("Mauvais argument"); 
