@@ -1,6 +1,11 @@
 package src2;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
 public class Projet {
     private char mode;
@@ -28,5 +33,10 @@ public class Projet {
 
     public boolean verifyMessage(Signature signatureAlgorithm, Hash hashFunction) {
         return signatureAlgorithm.verify(this.signature, this.message, this.publicKey);
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Hello, PDF!");
+
     }
 }
