@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Random;
 
-public class DSA implements Signatures2 {
+public class DSA implements Signatures {
     @Override
     public BigInteger[] keyGen() {
         // Keys generation function

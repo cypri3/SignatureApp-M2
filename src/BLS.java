@@ -1,6 +1,6 @@
 import java.math.BigInteger;
 
-public class BLS implements Signature2 {
+public class BLS implements Signatures {
     @Override
     public void keyGen(int keySize) {
     }

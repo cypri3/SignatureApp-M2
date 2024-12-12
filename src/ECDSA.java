@@ -1,6 +1,6 @@
 import java.math.BigInteger;
 
-public class ECDSA implements Signature2 {
+public class ECDSA implements Signatures {
     @Override
     public void keyGen(int keySize) {
     }
