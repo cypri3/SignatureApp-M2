@@ -40,5 +40,26 @@ public class PDFMetadataExample {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        try (PDDocument document = PDDocument.load(inputFile)) {
+            // Récupérer et modifier les métadonnées
+            PDDocumentInformation info = document.getDocumentInformation();
+            info.setCustomMetadataValue("Signature", "SignatureTest12345");
+            document.setDocumentInformation(info);
+
+            // Sauvegarder le fichier avec les nouvelles métadonnées
+            document.save("tests/example_with_metadata.pdf");
+            System.out.println("Mise à jour des métadonnées réussie !");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (PDDocument document = PDDocument.load(new File("tests/example_with_metadata.pdf"))) {
+            PDDocumentInformation info = document.getDocumentInformation();
+            String signature = info.getCustomMetadataValue("Signature");
+            System.out.println("Signature récupérée : " + signature);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
