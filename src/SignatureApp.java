@@ -39,6 +39,7 @@ public class SignatureApp {
                         selectedFile = files.get(0);
                         fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
                     }
+                    readPDFAsBytes()
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
