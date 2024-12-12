@@ -4,10 +4,16 @@ import java.awt.dnd.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.security.PublicKey;
 import javax.swing.*;
+import src.PKI;
 
 public class SignatureApp {
     private static File selectedFile = null;
+
+    private static int selectedUser;
+    private static int[] PublicKey;
+    private static int[] privateKey;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Signature App - Gestion de la PKI");
@@ -48,36 +54,43 @@ public class SignatureApp {
         JButton loadUser = new JButton("Charger un utilisateur existant");
 
         newUser.addActionListener(evt -> {
-            String userName = JOptionPane.showInputDialog(
-                    userPanel,
-                    "Entrez le nom du nouvel utilisateur :", 
-                    "Création d'utilisateur", 
-                    JOptionPane.QUESTION_MESSAGE);
-            if (userName == null || userName.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(frame, 
-                        "Nom d'utilisateur invalide. Veuillez réessayer.", 
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(frame,
-                        "Utilisateur '" + userName + "' créé avec succès.",
-                        "Succès", JOptionPane.INFORMATION_MESSAGE);
-            }
+            selectedUser = PKI.newUser();
+            JOptionPane.showMessageDialog(frame,
+                    "Utilisateur '" + selectedUser + "' créé avec succès.",
+                    "Succès", JOptionPane.INFORMATION_MESSAGE);
         });
 
         loadUser.addActionListener(evt -> {
-            String userName = JOptionPane.showInputDialog(
+            String userInput = JOptionPane.showInputDialog(
                     userPanel,
-                    "Entrez le nom de l'utilisateur à charger :", 
-                    "Chargement d'utilisateur", 
+                    "Entrez l'ID de l'utilisateur à charger :",
+                    "Chargement d'utilisateur",
                     JOptionPane.QUESTION_MESSAGE);
-            if (userName == null || userName.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(frame, 
-                        "Nom d'utilisateur invalide. Veuillez réessayer.", 
+
+            if (userInput == null || userInput.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(frame,
+                        "ID d'utilisateur invalide. Veuillez réessayer.",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(frame,
-                        "Utilisateur '" + userName + "' chargé avec succès.",
-                        "Succès", JOptionPane.INFORMATION_MESSAGE);
+                try {
+                    int userId = Integer.parseInt(userInput.trim());
+                    int sup = PKI.getUserId() - 1;
+
+                    if (userId <= sup && userId >= 0) {
+                        selectedUser = userId;
+                        JOptionPane.showMessageDialog(frame,
+                                "Utilisateur avec ID " + userId + " chargé avec succès.",
+                                "Succès", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(frame,
+                                "ID d'utilisateur invalide. Veuillez entrer un nombre entier entre 0 et " + sup,
+                                "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(frame,
+                            "ID d'utilisateur invalide. Veuillez entrer un nombre entier.",
+                            "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -105,8 +118,8 @@ public class SignatureApp {
 
         downloadButton.addActionListener(e -> {
             if (selectedFile == null) {
-                JOptionPane.showMessageDialog(frame, 
-                        "Aucun fichier traité. Veuillez effectuer une opération avant de télécharger.", 
+                JOptionPane.showMessageDialog(frame,
+                        "Aucun fichier traité. Veuillez effectuer une opération avant de télécharger.",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } else {
                 JFileChooser saveChooser = new JFileChooser();
@@ -121,8 +134,8 @@ public class SignatureApp {
                                 "Succès", JOptionPane.INFORMATION_MESSAGE);
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        JOptionPane.showMessageDialog(frame, 
-                                "Erreur lors de l'enregistrement.", 
+                        JOptionPane.showMessageDialog(frame,
+                                "Erreur lors de l'enregistrement.",
                                 "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -139,13 +152,14 @@ public class SignatureApp {
         buttonPanel.setBorder(BorderFactory.createTitledBorder("Opérations de signature"));
 
         JComboBox<String> algoBox = new JComboBox<>(new String[] { "BLS", "DSA", "RSA", "ECDSA" });
+        JComboBox<String> hashBox = new JComboBox<>(new String[] { "MD5", "SHA1", "SHA256" });
         JButton signButton = new JButton("Signer");
         JButton verifyButton = new JButton("Vérifier");
 
         signButton.addActionListener(e -> {
             if (selectedFile == null) {
-                JOptionPane.showMessageDialog(frame, 
-                        "Aucun fichier sélectionné. Veuillez en sélectionner un avant de signer.", 
+                JOptionPane.showMessageDialog(frame,
+                        "Aucun fichier sélectionné. Veuillez en sélectionner un avant de signer.",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(frame,
@@ -156,8 +170,8 @@ public class SignatureApp {
 
         verifyButton.addActionListener(e -> {
             if (selectedFile == null) {
-                JOptionPane.showMessageDialog(frame, 
-                        "Aucun fichier sélectionné. Veuillez en sélectionner un avant de vérifier.", 
+                JOptionPane.showMessageDialog(frame,
+                        "Aucun fichier sélectionné. Veuillez en sélectionner un avant de vérifier.",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(frame,
@@ -170,6 +184,8 @@ public class SignatureApp {
         buttonPanel.add(algoBox);
         buttonPanel.add(signButton);
         buttonPanel.add(verifyButton);
+        buttonPanel.add(new JLabel("Type de hashage :"));
+        buttonPanel.add(hashBox);
 
         // Ajout des panels au frame
         frame.add(panel, BorderLayout.CENTER);
