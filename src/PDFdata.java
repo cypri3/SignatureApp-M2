@@ -3,6 +3,11 @@ import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import org.apache.pdfbox.text.PDFTextStripper;
+
+import java.io.FileInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class PDFdata {
     private File file;
@@ -62,6 +67,14 @@ public class PDFdata {
             System.out.println("Métadonnée supprimée avec succès !");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static byte[] readPDFAsBytes(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] fileBytes = new byte[(int) file.length()];
+            fis.read(fileBytes);
+            return fileBytes;
         }
     }
 }
