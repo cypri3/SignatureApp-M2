@@ -3,9 +3,10 @@ package src2;
 import java.math.BigInteger;
 
 public interface Signature {
-    void keyGen(int keySize);
+    BigInteger[] keyGen();
 
-    byte[] sign(byte[] message, BigInteger privateKey, Hash function);
+    byte[] sign(byte[] hash, BigInteger[] keys);
 
-    boolean verify(byte[] signature, byte[] message, BigInteger publicKey);
+    boolean verify(byte[] signature, byte[] message, BigInteger[] publicKey);
+
 }
