@@ -70,7 +70,7 @@ public class PDFMetadataManager {
         }
     }
 
-    // TODO A supprimer 
+    // TODO A supprimer
     private static byte[] SHA1(byte[] message) throws NoSuchAlgorithmException {
 
         MessageDigest messageHash = MessageDigest.getInstance("SHA-1");
@@ -80,8 +80,7 @@ public class PDFMetadataManager {
         return hash;
     }
 
-    public static byte[] readPDFAsBytes(String filePath) throws IOException {
-        File file = new File(filePath);
+    public static byte[] readPDFAsBytes(File file) throws IOException {
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] fileBytes = new byte[(int) file.length()];
             fis.read(fileBytes);
@@ -178,7 +177,8 @@ public class PDFMetadataManager {
         }
 
         try {
-            byte[] fileBytes = readPDFAsBytes("tests/example_without.pdf");
+            File inputFile = new File("tests/example_with_metadata.pdf");
+            byte[] fileBytes = readPDFAsBytes(inputFile);
             byte[] defaultHash = SHA1(fileBytes);
 
             // Afficher le hash en hexadécimal
