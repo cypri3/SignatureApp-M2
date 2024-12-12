@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import src.Utils;
 
 public class PKI {
 
@@ -78,19 +77,19 @@ public class PKI {
     }
 
     public static void newKeys(int userId, String typeKey, BigInteger[] keys) {
-        String privateKey1 = null;
+        String privateKey1;
         String privateKey2 = null;
-        String publicKey1 = null;
+        String publicKey1;
         String publicKey2 = null;
 
-        if (typeKey == "RSA") {
-            privateKey1 = bigIntToHex(keys[0]);
-            privateKey2 = bigIntToHex(keys[1]);
-            publicKey1 = bigIntToHex(keys[2]);
-            publicKey1 = bigIntToHex(keys[3]);
+        if (typeKey.equals("RSA")) {
+            privateKey1 = Utils.bigIntToHex(keys[0]);
+            privateKey2 = Utils.bigIntToHex(keys[1]);
+            publicKey1 = Utils.bigIntToHex(keys[2]);
+            publicKey2 = Utils.bigIntToHex(keys[3]);
         } else {
-            privateKey1 = bigIntToHex(keys[0]);
-            publicKey1 = bigIntToHex(keys[1]);
+            privateKey1 = Utils.bigIntToHex(keys[0]);
+            publicKey1 = Utils.bigIntToHex(keys[1]);
         }
 
         try {
@@ -113,7 +112,7 @@ public class PKI {
                     lines.add(originalLine);
                     line = reader.readLine();
                     if (line.trim().startsWith("<privateKey>")) {
-                        if (typeKey == "RSA") {
+                        if (typeKey.equals("RSA")) {
                             lines.add("        <privateKey>" + privateKey1 + "," + privateKey2 + "</privateKey>");
                         } else {
                             lines.add("        <privateKey>" + privateKey1 + "</privateKey>");
@@ -122,7 +121,7 @@ public class PKI {
 
                     line = reader.readLine();
                     if (line.trim().startsWith("<publicKey>")) {
-                        if (typeKey == "RSA") {
+                        if (typeKey.equals("RSA")) {
                             lines.add("        <publicKey>" + publicKey1 + "," + publicKey2 + "</publicKey>");
                         } else {
                             lines.add("        <publicKey>" + publicKey1 + "</publicKey>");
@@ -169,17 +168,17 @@ public class PKI {
 
                     line = reader.readLine().trim();
                     if (line.startsWith("<publicKey>")) {
-                        if (typeKey == "RSA") {
+                        if (typeKey.equals("RSA")) {
                             String publicKeys = line.substring(13, line.indexOf("</publicKey>"));
                             String[] publicKeyParts = publicKeys.split(",");
                             if (publicKeyParts[0] != null) {
-                                publicKey1 = hexToBigInt(publicKeyParts[0]);
-                                publicKey2 = hexToBigInt(publicKeyParts[1]);
+                                publicKey1 = Utils.hexToBigInt(publicKeyParts[0]);
+                                publicKey2 = Utils.hexToBigInt(publicKeyParts[1]);
                             }
                         } else {
                             String publicKey = line.substring(13, line.indexOf("</publicKey>"));
                             if (publicKey != null) {
-                                publicKey1 = hexToBigInt(publicKey);
+                                publicKey1 = Utils.hexToBigInt(publicKey);
                             }
                         }
                     }
@@ -221,17 +220,17 @@ public class PKI {
 
                     line = reader.readLine().trim();
                     if (line.startsWith("<privateKey>")) {
-                        if (typeKey == "RSA") {
+                        if (typeKey.equals("RSA")) {
                             String privateKeys = line.substring(13, line.indexOf("</privateKey>"));
                             String[] privateKeyParts = privateKeys.split(",");
                             if (privateKeyParts[0] != null) {
-                                privateKey1 = hexToBigInt(privateKeyParts[0]);
-                                privateKey2 = hexToBigInt(privateKeyParts[1]);
+                                privateKey1 = Utils.hexToBigInt(privateKeyParts[0]);
+                                privateKey2 = Utils.hexToBigInt(privateKeyParts[1]);
                             }
                         } else {
                             String privateKey = line.substring(13, line.indexOf("</privateKey>"));
                             if (privateKey != null) {
-                                privateKey1 = hexToBigInt(privateKey);
+                                privateKey1 = Utils.hexToBigInt(privateKey);
                             }
                         }
                     }

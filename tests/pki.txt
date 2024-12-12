@@ -1,0 +1,23 @@
+<user>0</user>
+    <key>
+        <type>DSA</type>
+        <privateKey>d9ade26e</privateKey>
+        <publicKey>d414ebc6</publicKey>
+    </key>
+    <key>
+        <type>RSA</type>
+        <privateKey>null,null</privateKey>
+        <publicKey>null,null</publicKey>
+    </key>
+    <key>
+        <type>BLS</type>
+        <privateKey>null</privateKey>
+        <publicKey>null</publicKey>
+    </key>
+    <key>
+        <type>ECDSA</type>
+        <privateKey>null</privateKey>
+        <publicKey>null</publicKey>
+    </key>
+</user>
+
