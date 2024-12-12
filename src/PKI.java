@@ -14,37 +14,36 @@ public class PKI {
 
     public static int newUser() {
         try {
-            FileWriter file = new FileWriter(filename,true);
+            FileWriter file = new FileWriter(filename, true);
             BufferedWriter buffered = new BufferedWriter(file);
             int userId = getUserId();
-            String newKey = "<user>"+ userId + "</user>\n" +
-                            "    <key>\n" +
-                            "        <type>DSA</type>\n" +
-                            "        <privateKey>" + null + "</privateKey>\n" +
-                            "        <publicKey>" + null + "</publicKey>\n" +
-                            "    </key>\n" +
-                            "    <key>\n" +
-                            "        <type>RSA</type>\n" +
-                            "        <privateKey>" + null + "," + null + "</privateKey>\n" +
-                            "        <publicKey>" + null + "," + null + "</publicKey>\n" +
-                            "    </key>\n" +
-                            "    <key>\n" +
-                            "        <type>BLS</type>\n" +
-                            "        <privateKey>" + null + "</privateKey>\n" +
-                            "        <publicKey>" + null + "</publicKey>\n" +
-                            "    </key>\n" +
-                            "    <key>\n" +
-                            "        <type>ECDSA</type>\n" +
-                            "        <privateKey>" + null + "</privateKey>\n" +
-                            "        <publicKey>"  + null + "</publicKey>\n" +
-                            "    </key>\n" +
-                            "</user>\n";           
+            String newKey = "<user>" + userId + "</user>\n" +
+                    "    <key>\n" +
+                    "        <type>DSA</type>\n" +
+                    "        <privateKey>" + null + "</privateKey>\n" +
+                    "        <publicKey>" + null + "</publicKey>\n" +
+                    "    </key>\n" +
+                    "    <key>\n" +
+                    "        <type>RSA</type>\n" +
+                    "        <privateKey>" + null + "," + null + "</privateKey>\n" +
+                    "        <publicKey>" + null + "," + null + "</publicKey>\n" +
+                    "    </key>\n" +
+                    "    <key>\n" +
+                    "        <type>BLS</type>\n" +
+                    "        <privateKey>" + null + "</privateKey>\n" +
+                    "        <publicKey>" + null + "</publicKey>\n" +
+                    "    </key>\n" +
+                    "    <key>\n" +
+                    "        <type>ECDSA</type>\n" +
+                    "        <privateKey>" + null + "</privateKey>\n" +
+                    "        <publicKey>" + null + "</publicKey>\n" +
+                    "    </key>\n" +
+                    "</user>\n";
             buffered.write(newKey);
             buffered.newLine();
             buffered.close();
             return userId;
-        } 
-        catch(IOException e) {
+        } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
         return 0;
@@ -54,18 +53,18 @@ public class PKI {
         try {
             File file = new File(filename);
             if (file.length() == 0) {
-                return 0; 
+                return 0;
             }
             int lastUserId = -1;
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
             while ((line = reader.readLine()) != null) {
-                line = line.trim(); 
+                line = line.trim();
                 if (line.startsWith("<user>") && line.endsWith("</user>")) {
-                    String idStr = line.substring(6, line.indexOf("</user>")); 
+                    String idStr = line.substring(6, line.indexOf("</user>"));
                     int userId = Integer.parseInt(idStr);
                     if (userId > lastUserId) {
-                        lastUserId = userId; 
+                        lastUserId = userId;
                     }
                 }
             }
@@ -73,9 +72,9 @@ public class PKI {
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        return 0; 
+        return 0;
     }
-    
+
     public static void newKeys(int userId, String typeKey, BigInteger[] keys) {
         String privateKey1 = null;
         String privateKey2 = null;
@@ -87,8 +86,7 @@ public class PKI {
             privateKey2 = bigIntToHex(keys[1]);
             publicKey1 = bigIntToHex(keys[2]);
             publicKey1 = bigIntToHex(keys[3]);
-        }
-        else {
+        } else {
             privateKey1 = bigIntToHex(keys[0]);
             publicKey1 = bigIntToHex(keys[1]);
         }
@@ -99,51 +97,49 @@ public class PKI {
             List<String> lines = new ArrayList<>();
             String line;
             boolean isTargetUser = false;
-    
+
             while ((line = reader.readLine()) != null) {
                 String originalLine = line;
-    
+
                 if (line.trim().startsWith("<user>") && line.trim().endsWith("</user>")) {
                     String idStr = line.substring(6, line.indexOf("</user>"));
                     int currentUserId = Integer.parseInt(idStr);
                     isTargetUser = (currentUserId == userId);
                 }
-    
-                if (isTargetUser && originalLine.trim().startsWith("<type>"+typeKey+"</type>")) {
-                    lines.add(originalLine); 
+
+                if (isTargetUser && originalLine.trim().startsWith("<type>" + typeKey + "</type>")) {
+                    lines.add(originalLine);
                     line = reader.readLine();
                     if (line.trim().startsWith("<privateKey>")) {
                         if (typeKey == "RSA") {
                             lines.add("        <privateKey>" + privateKey1 + "," + privateKey2 + "</privateKey>");
-                        }
-                        else {
+                        } else {
                             lines.add("        <privateKey>" + privateKey1 + "</privateKey>");
                         }
                     }
-    
+
                     line = reader.readLine();
                     if (line.trim().startsWith("<publicKey>")) {
                         if (typeKey == "RSA") {
                             lines.add("        <publicKey>" + publicKey1 + "," + publicKey2 + "</publicKey>");
-                        }
-                        else {
+                        } else {
                             lines.add("        <publicKey>" + publicKey1 + "</publicKey>");
                         }
                     }
                     continue;
                 }
-    
+
                 lines.add(originalLine);
             }
             reader.close();
-    
+
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             for (String modifiedLine : lines) {
                 writer.write(modifiedLine);
                 writer.newLine();
             }
             writer.close();
-    
+
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -171,15 +167,14 @@ public class PKI {
 
                     line = reader.readLine().trim();
                     if (line.startsWith("<publicKey>")) {
-                        if (typeKey =="RSA") {
+                        if (typeKey == "RSA") {
                             String publicKeys = line.substring(13, line.indexOf("</publicKey>"));
                             String[] publicKeyParts = publicKeys.split(",");
                             if (publicKeyParts[0] != null) {
                                 publicKey1 = hexToBigInt(publicKeyParts[0]);
                                 publicKey2 = hexToBigInt(publicKeyParts[1]);
                             }
-                        }
-                        else {
+                        } else {
                             String publicKey = line.substring(13, line.indexOf("</publicKey>"));
                             if (publicKey != null) {
                                 publicKey1 = hexToBigInt(publicKey);
@@ -189,7 +184,7 @@ public class PKI {
 
                     reader.close();
                     if (publicKey1 != null) {
-                        BigInteger[] publicK = {publicKey1, publicKey2};
+                        BigInteger[] publicK = { publicKey1, publicKey2 };
                         return publicK;
                     }
                 }
@@ -231,8 +226,7 @@ public class PKI {
                                 privateKey1 = hexToBigInt(privateKeyParts[0]);
                                 privateKey2 = hexToBigInt(privateKeyParts[1]);
                             }
-                        }
-                        else {
+                        } else {
                             String privateKey = line.substring(13, line.indexOf("</privateKey>"));
                             if (privateKey != null) {
                                 privateKey1 = hexToBigInt(privateKey);
@@ -240,7 +234,7 @@ public class PKI {
                         }
                     }
                     reader.close();
-                    BigInteger[] privateK = {privateKey1, privateKey2};
+                    BigInteger[] privateK = { privateKey1, privateKey2 };
                     return privateK;
                 }
             }
@@ -254,11 +248,10 @@ public class PKI {
     public static void main(String[] args) {
         BigInteger privateKey = new BigInteger("708026688110");
         BigInteger publicKey = new BigInteger("50802781126");
-        BigInteger[] keys = {privateKey, publicKey};
-        int userId = PKI.newUser();
-        PKI.newKeys(userId, "DSA", keys);
-        BigInteger[] pk = PKI.getPublicKey(userId, "DSA");
-        BigInteger[] sk = PKI.getPrivateKey(userId, "DSA");
+        BigInteger[] keys = { privateKey, publicKey };
+        int userId = PKI2.newUser();
+        PKI2.newKeys(userId, "DSA", keys);
+        BigInteger[] pk = PKI2.getPublicKey(userId, "DSA");
+        BigInteger[] sk = PKI2.getPrivateKey(userId, "DSA");
     }
 }
-

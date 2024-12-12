@@ -21,17 +21,17 @@ public class Projet {
         this.keySize = keySize;
     }
 
-    public void generateKeys(Signature signatureAlgorithm) {
+    public void generateKeys(Signature2 signatureAlgorithm) {
         signatureAlgorithm.keyGen(this.keySize);
         System.out.println("Keys generated for mode: " + mode);
     }
 
-    public void signMessage(Signature signatureAlgorithm, Hash hashFunction) {
+    public void signMessage(Signature2 signatureAlgorithm, Hash hashFunction) {
         this.signature = signatureAlgorithm.sign(this.message, this.privateKey, hashFunction);
         System.out.println("Message signed.");
     }
 
-    public boolean verifyMessage(Signature signatureAlgorithm, Hash hashFunction) {
+    public boolean verifyMessage(Signature2 signatureAlgorithm, Hash hashFunction) {
         return signatureAlgorithm.verify(this.signature, this.message, this.publicKey);
     }
 

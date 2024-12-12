@@ -2,7 +2,7 @@ package src2;
 
 import java.math.BigInteger;
 
-public class DSA implements Signature {
+public class DSA implements Signature2 {
     @Override
     public void keyGen(int keySize) {
     }

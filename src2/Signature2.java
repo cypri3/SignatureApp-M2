@@ -2,7 +2,7 @@ package src2;
 
 import java.math.BigInteger;
 
-public interface Signature {
+public interface Signature2 {
     void keyGen(int keySize);
 
     byte[] sign(byte[] message, BigInteger privateKey, Hash function);

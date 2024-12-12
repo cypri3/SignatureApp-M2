@@ -1,6 +1,6 @@
 import java.math.BigInteger;
 
-public class RSA implements Signature {
+public class RSA implements Signature2 {
     @Override
     public void keyGen(int keySize) {
     }
