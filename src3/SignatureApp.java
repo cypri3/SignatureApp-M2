@@ -12,7 +12,6 @@ import src.PKI;
 import src.PDFMetadataManager;
 import java.math.BigInteger;
 import src.*;
-import src2.*;
 
 public class SignatureApp {
     private static File selectedFile = null;

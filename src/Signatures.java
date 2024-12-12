@@ -5,4 +5,6 @@ public interface Signatures {
 
     boolean verify(byte[] signature, byte[] message, BigInteger[] publicKey);
 
+    byte[] sign(byte[] hash, BigInteger[] keys);
+
 }
