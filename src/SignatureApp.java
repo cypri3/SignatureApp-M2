@@ -2,11 +2,17 @@ import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.*;
 import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.security.PublicKey;
 import javax.swing.*;
 import src.PKI;
+import src.PDFMetadataManager;
+import java.math.BigInteger;
+import src.*;
+import src2.*;
 
 public class SignatureApp {
     private static File selectedFile = null;
@@ -14,6 +20,37 @@ public class SignatureApp {
     private static int selectedUser;
     private static int[] PublicKey;
     private static int[] privateKey;
+
+    private static Signature selectSignatureAlgorithm(String selectedSignature) {
+        switch (selectedSignature) {
+            case "BLS":
+                return new BLS();
+            case "DSA":
+                return new DSA();
+            case "RSA":
+                return new RSA();
+            case "ECDSA":
+                return new ECDSA();
+            default:
+                JOptionPane.showMessageDialog(null, "Algorithme de signature inconnu", "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
+                return null;
+        }
+    }
+
+    private static Hash selectHashFunction(String selectedHash) {
+        switch (selectedHash) {
+            case "MD5":
+                return new MD5();
+            case "SHA1":
+                return new SHA1();
+            case "SHA256":
+                return new SHA256();
+            default:
+                JOptionPane.showMessageDialog(null, "Algorithme de hash inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return null;
+        }
+    }
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Signature App - Gestion de la PKI");
@@ -39,7 +76,6 @@ public class SignatureApp {
                         selectedFile = files.get(0);
                         fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
                     }
-                    readPDFAsBytes()
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -163,6 +199,32 @@ public class SignatureApp {
                         "Aucun fichier sélectionné. Veuillez en sélectionner un avant de signer.",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } else {
+                try {
+                    byte[] pdfBytes = PDFMetadataManager.readPDFAsBytes(selectedFile);
+
+                } catch (IOException err) {
+                    err.printStackTrace();
+                }
+                String selectedSignature = (String) algoBox.getSelectedItem();
+                String selectedHash = (String) hashBox.getSelectedItem();
+
+                Signature signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
+
+                Hash hashFunction = selectHashFunction(selectedHash);
+
+                if (signatureAlgorithm != null && hashFunction != null) {
+                    System.out.println("Algorithme de signature : " + selectedSignature);
+                    System.out.println("Algorithme de hash : " + selectedHash);
+
+                    byte[] message = "Hello, world!".getBytes();
+                    BigInteger privateKey = new BigInteger("12345");
+                    byte[] signature = signatureAlgorithm.sign(message, privateKey, hashFunction);
+
+                    BigInteger publicKey = new BigInteger("67890");
+                    boolean isValid = signatureAlgorithm.verify(signature, message, publicKey);
+                    System.out.println("La signature est valide : " + isValid);
+                }
+
                 JOptionPane.showMessageDialog(frame,
                         "Fichier signé avec l'algorithme : " + algoBox.getSelectedItem(),
                         "Succès", JOptionPane.INFORMATION_MESSAGE);
@@ -196,4 +258,5 @@ public class SignatureApp {
 
         frame.setVisible(true);
     }
+
 }
