@@ -1,11 +1,9 @@
 import java.math.BigInteger;
 import java.util.Random;
 
-public class RSA implements Signature {
-
-public class RSA implements Signature {
+public class RSA implements Signatures {
     @Override
-    public BigInteger[] keyGen(){
+    public BigInteger[] keyGen() {
         BigInteger p = new BigInteger(2 ^ 50, 25, new Random());
         BigInteger q = new BigInteger(2 ^ 50, 25, new Random());
         BigInteger phi = (p.add(BigInteger.valueOf(-1))).multiply(q.add(BigInteger.valueOf(-1)));
@@ -22,7 +20,7 @@ public class RSA implements Signature {
     }
 
     @Override
-    public byte[] sign(byte[] hash, BigInteger[] keys){
+    public byte[] sign(byte[] hash, BigInteger[] keys) {
         BigInteger h = new BigInteger(hash);
         BigInteger phi = (keys[0].add(BigInteger.valueOf(-1))).multiply(keys[1].add(BigInteger.valueOf(-1)));
         BigInteger d = keys[2].modInverse(phi);
@@ -32,7 +30,7 @@ public class RSA implements Signature {
     }
 
     @Override
-    public boolean verify(byte[] signature, byte[] message, BigInteger[] publicKey){
+    public boolean verify(byte[] signature, byte[] message, BigInteger[] publicKey) {
         BigInteger s = new BigInteger(signature);
         BigInteger verif = s.modPow(publicKey[0], publicKey[1]);
         BigInteger m = new BigInteger(message);
