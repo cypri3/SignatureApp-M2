@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,8 @@ public class PKI {
                             "    </key>\n" +
                             "    <key>\n" +
                             "        <type>RSA</type>\n" +
-                            "        <privateKey>" + null + "</privateKey>\n" +
-                            "        <publicKey>" + null + "</publicKey>\n" +
+                            "        <privateKey>" + null + "," + null + "</privateKey>\n" +
+                            "        <publicKey>" + null + "," + null + "</publicKey>\n" +
                             "    </key>\n" +
                             "    <key>\n" +
                             "        <type>BLS</type>\n" +
@@ -35,7 +36,7 @@ public class PKI {
                             "    <key>\n" +
                             "        <type>ECDSA</type>\n" +
                             "        <privateKey>" + null + "</privateKey>\n" +
-                            "        <publicKey>" + null + "</publicKey>\n" +
+                            "        <publicKey>"  + null + "</publicKey>\n" +
                             "    </key>\n" +
                             "</user>\n";           
             buffered.write(newKey);
@@ -75,7 +76,18 @@ public class PKI {
         return 0; 
     }
     
-    public static void newKeyDSA(int userId, String typeKey, String publicKey, String privateKey) {
+    public static void newKeys(int userId, String typeKey, BigInteger[] keys) {
+        if (typeKey == "RSA") {
+            String privateKey1 = bigIntToHex(keys[0]);
+            String privateKey2 = bigIntToHex(keys[1]);
+            String publicKey1 = bigIntToHex(keys[2]);
+            String publicKey1 = bigIntToHex(keys[3]);
+        }
+        else {
+            String privateKey = bigIntToHex(keys[0]);
+            String publicKey = bigIntToHex(keys[1]);
+        }
+
         try {
             File file = new File(filename);
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -96,12 +108,22 @@ public class PKI {
                     lines.add(originalLine); 
                     line = reader.readLine();
                     if (line.trim().startsWith("<privateKey>")) {
-                        lines.add("        <privateKey>" + privateKey + "</privateKey>");
+                        if (typeKey == "RSA") {
+                            lines.add("        <privateKey>" + privateKey1 + "," + privateKey2 + "</privateKey>");
+                        }
+                        else {
+                            lines.add("        <privateKey>" + privateKey + "</privateKey>");
+                        }
                     }
     
                     line = reader.readLine();
                     if (line.trim().startsWith("<publicKey>")) {
-                        lines.add("        <publicKey>" + publicKey + "</publicKey>");
+                        if (typeKey = "RSA") {
+                            lines.add("        <publicKey>" + publicKey1 + "," + publicKey2 + "</publicKey>");
+                        }
+                        else {
+                            lines.add("        <publicKey>" + publicKey + "</publicKey>");
+                        }
                     }
                     continue;
                 }
@@ -122,7 +144,47 @@ public class PKI {
         }
     }
 
-    public static String getKeys(int userId, String typeKey) {
+    public static BigInteger[] getPublicKey(int userId, String typeKey) {
+        try {
+            File file = new File(filename);
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line;
+            boolean isTargetUser = false;
+
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+
+                if (line.startsWith("<user>") && line.endsWith("</user>")) {
+                    String idStr = line.substring(6, line.indexOf("</user>"));
+                    int currentUserId = Integer.parseInt(idStr);
+                    isTargetUser = (currentUserId == userId);
+                }
+
+                if (isTargetUser && line.startsWith("<type>" + typeKey + "</type>")) {
+                    String publicKey1 = null;
+                    String publicKey2 = null;
+
+                    line = reader.readLine().trim();
+                    if (line.startsWith("<publicKey>")) {
+                        publicKey1 = line.substring(13, line.indexOf("</publicKey>'"));
+                        publicKey2 = 
+                    }
+
+                    reader.close();
+                    BigInteger publicK = hexToBigInt(publicKey);
+                    return publicK;
+                }
+            }
+
+            reader.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        throw new IllegalArgumentException("Keys " + typeKey + " not found for userId: " + userId);
+    }
+
+    public static BigInteger getPrivateKey(int userId, String typeKey) {
         try {
             File file = new File(filename);
             BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -140,21 +202,17 @@ public class PKI {
 
                 if (isTargetUser && line.startsWith("<type>" + typeKey + "</type>")) {
                     String privateKey = null;
-                    String publicKey = null;
 
                     line = reader.readLine().trim();
                     if (line.startsWith("<privateKey>")) {
                         privateKey = line.substring(13, line.indexOf("</privateKey>"));
                     }
 
-                    line = reader.readLine().trim();
-                    if (line.startsWith("<publicKey>")) {
-                        publicKey = line.substring(13, line.indexOf("</publicKey>"));
-                    }
-
                     reader.close();
-
-                    return "Private Key: " + privateKey + "\nPublic Key: " + publicKey;
+                    if (privateKey != null) {
+                        BigInteger privateK = hexToBigInt(privateKey);
+                        return privateK;
+                    }
                 }
             }
 
@@ -162,17 +220,16 @@ public class PKI {
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
-
-        return "Keys " + typeKey + " not found for userId: " + userId;
+        throw new IllegalArgumentException("Keys " + typeKey + " not found for userId: " + userId);
     }
 
-
     public static void main(String[] args) {
-        String privateKey = "08026688110";
-        String publicKey = "0802781126";
+        BigInteger privateKey = new BigInteger("708026688110");
+        BigInteger publicKey = new BigInteger("50802781126");
         int userId = PKI.newUser();
-        PKI.newKeyDSA(userId, "DSA", privateKey, publicKey);
-        System.out.println(PKI.getKeys(userId, "DSA"));
+        PKI.newKeys(userId, "DSA", privateKey, publicKey);
+        BigInteger pk = PKI.getPublicKey(userId, "DSA");
+        BigInteger sk = PKI.getPrivateKey(userId, "DSA");
     }
 }
 
