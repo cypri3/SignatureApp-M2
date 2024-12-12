@@ -6,7 +6,7 @@ public class Main2 {
         }
 
         String filePath = args[0];
-        PDFMetadataManager manager = new PDFMetadataManager(filePath);
+        PDFdata manager = new PDFdata(filePath);
         manager.addMetadata("Signature", "SignatureTest12345");
         String signature = manager.getMetadata("Signature");
         System.out.println("Signature récupérée : " + signature);

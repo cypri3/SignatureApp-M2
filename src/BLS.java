@@ -6,7 +6,7 @@ public class BLS implements Signature2 {
     }
 
     @Override
-    public byte[] sign(byte[] message, BigInteger privateKey, Hash function) {
+    public byte[] sign(byte[] message, BigInteger privateKey, Hashs function) {
     }
 
     @Override

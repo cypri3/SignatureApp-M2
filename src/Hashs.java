@@ -1,8 +1,5 @@
-package src2;
-
 import java.security.NoSuchAlgorithmException;
 
-
-public interface Hash {
+public interface Hashs {
     byte[] hash(byte[] message) throws NoSuchAlgorithmException;
 }

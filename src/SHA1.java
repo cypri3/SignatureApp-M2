@@ -1,13 +1,11 @@
-package src2;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class MD5 implements Hash {
+public class SHA1 implements Hashs {
     @Override
-    public byte[] hash(byte[] message) throws NoSuchAlgorithmException{
-        
-        MessageDigest messageHash = MessageDigest.getInstance("MD5");
+    public byte[] hash(byte[] message) throws NoSuchAlgorithmException {
+
+        MessageDigest messageHash = MessageDigest.getInstance("SHA-1");
         messageHash.update(message);
         byte[] hash = messageHash.digest();
 

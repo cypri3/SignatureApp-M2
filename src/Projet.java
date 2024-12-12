@@ -1,5 +1,3 @@
-package src2;
-
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -26,12 +24,12 @@ public class Projet {
         System.out.println("Keys generated for mode: " + mode);
     }
 
-    public void signMessage(Signature2 signatureAlgorithm, Hash hashFunction) {
+    public void signMessage(Signature2 signatureAlgorithm, Hashs hashFunction) {
         this.signature = signatureAlgorithm.sign(this.message, this.privateKey, hashFunction);
         System.out.println("Message signed.");
     }
 
-    public boolean verifyMessage(Signature2 signatureAlgorithm, Hash hashFunction) {
+    public boolean verifyMessage(Signature2 signatureAlgorithm, Hashs hashFunction) {
         return signatureAlgorithm.verify(this.signature, this.message, this.publicKey);
     }
 

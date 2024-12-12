@@ -1,15 +1,13 @@
-package src2;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
-public class PDFMetadataManager {
+public class PDFdata {
     private File file;
 
-    public PDFMetadataManager(String filePath) {
+    public PDFdata(String filePath) {
         this.file = new File(filePath);
     }
 

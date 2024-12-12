@@ -21,7 +21,7 @@ public class SignatureApp {
     private static int[] PublicKey;
     private static int[] privateKey;
 
-    private static Signature selectSignatureAlgorithm(String selectedSignature) {
+    private static Signatures2 selectSignatureAlgorithm(String selectedSignature) {
         switch (selectedSignature) {
             case "BLS":
                 return new BLS();
@@ -38,7 +38,7 @@ public class SignatureApp {
         }
     }
 
-    private static Hash selectHashFunction(String selectedHash) {
+    private static Hashs selectHashFunction(String selectedHash) {
         switch (selectedHash) {
             case "MD5":
                 return new MD5();
@@ -91,7 +91,7 @@ public class SignatureApp {
         JButton loadUser = new JButton("Charger un utilisateur existant");
 
         newUser.addActionListener(evt -> {
-            selectedUser = PKI.newUser();
+            selectedUser = PKI3.newUser();
             JOptionPane.showMessageDialog(frame,
                     "Utilisateur '" + selectedUser + "' créé avec succès.",
                     "Succès", JOptionPane.INFORMATION_MESSAGE);
@@ -111,7 +111,7 @@ public class SignatureApp {
             } else {
                 try {
                     int userId = Integer.parseInt(userInput.trim());
-                    int sup = PKI.getUserId() - 1;
+                    int sup = PKI3.getUserId() - 1;
 
                     if (userId <= sup && userId >= 0) {
                         selectedUser = userId;
@@ -200,7 +200,7 @@ public class SignatureApp {
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } else {
                 try {
-                    byte[] pdfBytes = PDFMetadataManager.readPDFAsBytes(selectedFile);
+                    byte[] pdfBytes = PDFdata.readPDFAsBytes(selectedFile);
 
                 } catch (IOException err) {
                     err.printStackTrace();
@@ -208,9 +208,9 @@ public class SignatureApp {
                 String selectedSignature = (String) algoBox.getSelectedItem();
                 String selectedHash = (String) hashBox.getSelectedItem();
 
-                Signature signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
+                Signatures2 signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
 
-                Hash hashFunction = selectHashFunction(selectedHash);
+                Hashs hashFunction = selectHashFunction(selectedHash);
 
                 if (signatureAlgorithm != null && hashFunction != null) {
                     System.out.println("Algorithme de signature : " + selectedSignature);

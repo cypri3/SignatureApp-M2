@@ -1,5 +1,3 @@
-package src2;
-
 import java.math.BigInteger;
 import java.util.Random;
 
