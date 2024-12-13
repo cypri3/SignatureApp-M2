@@ -21,7 +21,7 @@ public class SignatureApp {
     private static int[] PublicKey;
     private static int[] privateKey;
 
-    private static Signatures2 selectSignatureAlgorithm(String selectedSignature) {
+    private static Signatures selectSignatureAlgorithm(String selectedSignature) {
         switch (selectedSignature) {
             case "BLS":
                 return new BLS();
@@ -208,7 +208,7 @@ public class SignatureApp {
                 String selectedSignature = (String) algoBox.getSelectedItem();
                 String selectedHash = (String) hashBox.getSelectedItem();
 
-                Signatures2 signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
+                Signatures signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
 
                 Hashs hashFunction = selectHashFunction(selectedHash);
 

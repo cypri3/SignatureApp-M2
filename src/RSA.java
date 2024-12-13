@@ -1,9 +1,6 @@
 import java.math.BigInteger;
 import java.util.Random;
-
-public class RSA implements Signature {
-
-public class RSA implements Signature {
+public class RSA implements Signatures {
     @Override
     public BigInteger[] keyGen(){
         BigInteger p = new BigInteger(2 ^ 50, 25, new Random());

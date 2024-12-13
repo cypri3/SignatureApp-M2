@@ -7,12 +7,12 @@ public class Utils {
     static final BigInteger b = new BigInteger("2455155546008943817740293915197451784769108058161191238065");
     static final BigInteger p = new BigInteger("6277101735386680763835789423207666416083908700390324961279");
 
-    public BigInteger hexToBigInt(String stringHex) {
+    public static BigInteger hexToBigInt(String stringHex) {
         BigInteger integerHex = new BigInteger(stringHex, 16);
         return integerHex;
     }
 
-    static String bigIntToHex(BigInteger bigInteger) {
+    public static String bigIntToHex(BigInteger bigInteger) {
         String stringHex = bigInteger.toString(16);
         return stringHex;
     }

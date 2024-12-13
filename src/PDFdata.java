@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -62,6 +63,14 @@ public class PDFdata {
             System.out.println("Métadonnée supprimée avec succès !");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+        public static byte[] readPDFAsBytes(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] fileBytes = new byte[(int) file.length()];
+            fis.read(fileBytes);
+            return fileBytes;
         }
     }
 }

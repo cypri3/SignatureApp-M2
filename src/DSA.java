@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Random;
 
-public class DSA implements Signatures2 {
+public class DSA implements Signatures {
 
     static final BigInteger l = new BigInteger("2").pow(160).add(new BigInteger("7"));
     static final BigInteger p = new BigInteger("1").add(l.multiply(new BigInteger("2").pow(864).add(new BigInteger("218"))));

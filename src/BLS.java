@@ -1,15 +1,18 @@
 import java.math.BigInteger;
 
-public class BLS implements Signature2 {
+public class BLS implements Signatures {
     @Override
-    public void keyGen(int keySize) {
+    public BigInteger[] keyGen() {
+        return new BigInteger[2];
     }
 
     @Override
-    public byte[] sign(byte[] message, BigInteger privateKey, Hashs function) {
+    public byte[] sign(byte[] hash, BigInteger[] privateKey) {
+        return new byte[0];
     }
 
     @Override
-    public boolean verify(byte[] signature, byte[] message, BigInteger publicKey) {
+    public boolean verify(byte[] signature, byte[] hash, BigInteger[] publicKey) {
+        return false;
     }
 }
