@@ -5,6 +5,12 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class DSA implements Signatures2 {
+
+    static final BigInteger l = new BigInteger("2").pow(160).add(new BigInteger("7"));
+    static final BigInteger p = new BigInteger("1").add(l.multiply(new BigInteger("2").pow(864).add(new BigInteger("218"))));
+    static final BigInteger g = new BigInteger("2").modPow(p.subtract(BigInteger.ONE).divide(l), p);
+
+
     @Override
     public BigInteger[] keyGen() {
         // Keys generation function

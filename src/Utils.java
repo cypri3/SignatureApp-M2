@@ -17,7 +17,7 @@ public class Utils {
         return stringHex;
     }
 
-    public BigInteger[] add(BigInteger[] coordP,BigInteger[] coordQ){
+    static BigInteger[] add(BigInteger[] coordP,BigInteger[] coordQ){
         BigInteger lambda;
         BigInteger xP = coordP[0];
         BigInteger yP = coordP[1];
@@ -51,7 +51,7 @@ public class Utils {
         return coordR;
     }
             
-    public BigInteger[] multByK(BigInteger[] coord,BigInteger k){  
+    static BigInteger[] multByK(BigInteger[] coord,BigInteger k){  
         int bitLength = k.bitLength();
         BigInteger[] resP = {BigInteger.ZERO,BigInteger.ZERO};
         for (int i = bitLength-1; i >= 0; --i) {
