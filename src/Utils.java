@@ -12,11 +12,11 @@ public class Utils {
         return integerHex;
     }
 
-    public String bigIntToHex(BigInteger bigInteger) {
-        int integerHex = bigInteger.intValue();
-        String stringHex = Integer.toHexString(integerHex);
+    static String bigIntToHex(BigInteger bigInteger) {
+        String stringHex = bigInteger.toString(16);
         return stringHex;
     }
+
     public BigInteger[] add(BigInteger[] coordP,BigInteger[] coordQ){
         BigInteger lambda;
         BigInteger xP = coordP[0];

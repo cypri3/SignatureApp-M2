@@ -1,8 +1,9 @@
 import java.math.BigInteger;
 
 public interface Signatures {
-    void keyGen(int keySize);
+    public BigInteger[] keyGen();
 
-    boolean verify(byte[] signature, byte[] message, BigInteger[] publicKey);
+    public byte[] sign(byte[] hash, BigInteger[] keys);
 
+    public boolean verify(byte[] signature, byte[] hash, BigInteger[] publicKey);
 }
