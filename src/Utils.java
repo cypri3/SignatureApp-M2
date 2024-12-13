@@ -7,8 +7,7 @@ public class Utils {
     }
 
     static String bigIntToHex(BigInteger bigInteger) {
-        int integerHex = bigInteger.intValue();
-        String stringHex = Integer.toHexString(integerHex);
+        String stringHex = bigInteger.toString(16);
         return stringHex;
     }
 }
