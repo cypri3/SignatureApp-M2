@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import javax.swing.*;
 import java.math.BigInteger;
@@ -26,7 +27,7 @@ public class Projet {
     private static Signatures selectSignatureAlgorithm(String selectedSignature) {
         switch (selectedSignature) {
             case "BLS":
-                return new BLS();
+                return new BLS01();
             case "DSA":
                 return new DSA();
             case "RSA":
@@ -203,34 +204,48 @@ public class Projet {
             } else {
                 try {
                     byte[] pdfBytes = PDFdata.readPDFAsBytes(selectedFile);
-
+        
+                    String selectedSignature = (String) algoBox.getSelectedItem();
+                    String selectedHash = (String) hashBox.getSelectedItem();
+        
+                    Signatures signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
+                    Hashs hashFunction = selectHashFunction(selectedHash);
+        
+                    if (signatureAlgorithm != null && hashFunction != null) {
+                        System.out.println("Algorithme de signature : " + selectedSignature);
+                        System.out.println("Algorithme de hash : " + selectedHash);
+        
+                        byte[] hashValue = null;
+                        try {
+                            hashValue = hashFunction.hash(pdfBytes);  
+                        } catch (NoSuchAlgorithmException ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(frame,
+                                    "Erreur d'algorithme de hachage : " + ex.getMessage(),
+                                    "Erreur", JOptionPane.ERROR_MESSAGE);
+                            return; 
+                        }
+        
+                        BigInteger[] keyPair = signatureAlgorithm.keyGen();
+                        BigInteger[] privateKey = { keyPair[0] };
+                        BigInteger[] publicKey = { keyPair[1] };
+        
+                        byte[] signature = signatureAlgorithm.sign(hashValue, privateKey);
+                        System.out.println("Signature générée : " + new BigInteger(1, signature).toString(16));
+        
+                        boolean isValid = signatureAlgorithm.verify(signature, hashValue, publicKey);
+                        System.out.println("La signature est valide : " + isValid);
+                        
+                        JOptionPane.showMessageDialog(frame,
+                                "Fichier signé avec l'algorithme : " + algoBox.getSelectedItem(),
+                                "Succès", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Algorithme de signature ou de hachage invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
                 } catch (IOException err) {
                     err.printStackTrace();
+                    JOptionPane.showMessageDialog(frame, "Erreur lors de la lecture du fichier", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
-                String selectedSignature = (String) algoBox.getSelectedItem();
-                String selectedHash = (String) hashBox.getSelectedItem();
-
-                Signatures signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
-
-                Hashs hashFunction = selectHashFunction(selectedHash);
-
-                if (signatureAlgorithm != null && hashFunction != null) {
-                    System.out.println("Algorithme de signature : " + selectedSignature);
-                    System.out.println("Algorithme de hash : " + selectedHash);
-
-                    byte[] message = "Hello, world!".getBytes();
-                    // TODO faire le hash ici
-                    BigInteger[] privateKey = { new BigInteger("12345") };
-                    byte[] signature = signatureAlgorithm.sign(message, privateKey);
-
-                    BigInteger publicKey[] = { new BigInteger("67890") };
-                    boolean isValid = signatureAlgorithm.verify(signature, message, publicKey);
-                    System.out.println("La signature est valide : " + isValid);
-                }
-
-                JOptionPane.showMessageDialog(frame,
-                        "Fichier signé avec l'algorithme : " + algoBox.getSelectedItem(),
-                        "Succès", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
