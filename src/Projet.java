@@ -93,7 +93,7 @@ public class Projet {
         JButton loadUser = new JButton("Charger un utilisateur existant");
 
         newUser.addActionListener(evt -> {
-            selectedUser = PKI3.newUser();
+            selectedUser = PKI.newUser();
             JOptionPane.showMessageDialog(frame,
                     "Utilisateur '" + selectedUser + "' créé avec succès.",
                     "Succès", JOptionPane.INFORMATION_MESSAGE);
@@ -113,7 +113,7 @@ public class Projet {
             } else {
                 try {
                     int userId = Integer.parseInt(userInput.trim());
-                    int sup = PKI3.getUserId() - 1;
+                    int sup = PKI.getUserId() - 1;
 
                     if (userId <= sup && userId >= 0) {
                         selectedUser = userId;
@@ -219,10 +219,10 @@ public class Projet {
                     System.out.println("Algorithme de hash : " + selectedHash);
 
                     byte[] message = "Hello, world!".getBytes();
-                    BigInteger privateKey = new BigInteger("12345");
-                    byte[] signature = signatureAlgorithm.sign(message, privateKey, hashFunction);
+                    BigInteger[] privateKey = { new BigInteger("12345") };
+                    byte[] signature = signatureAlgorithm.sign(message, privateKey);
 
-                    BigInteger publicKey = new BigInteger("67890");
+                    BigInteger publicKey[] = { new BigInteger("67890") };
                     boolean isValid = signatureAlgorithm.verify(signature, message, publicKey);
                     System.out.println("La signature est valide : " + isValid);
                 }
