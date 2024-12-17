@@ -15,8 +15,9 @@ public class PDFdata {
         this.file = new File(filePath);
     }
 
-    public void addMetadata(String key, String value) {
+    public void addMetadata(String key, byte[] valueBytes) {
         try (PDDocument document = PDDocument.load(file)) {
+            String value = new String(valueBytes, java.nio.charset.StandardCharsets.UTF_8);
             PDDocumentInformation info = document.getDocumentInformation();
             info.setCustomMetadataValue(key, value);
             document.setDocumentInformation(info);
@@ -27,14 +28,14 @@ public class PDFdata {
         }
     }
 
-    public String getMetadata(String key) {
+    public byte[] getMetadata(String key) {
         try (PDDocument document = PDDocument.load(file)) {
             PDDocumentInformation info = document.getDocumentInformation();
             String value = info.getCustomMetadataValue(key);
             if (value != null) {
-                return value;
+                return value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
             } else {
-                return "Aucune donnée trouvée pour cette clé";
+                return new byte[0];
             }
         } catch (IOException e) {
             e.printStackTrace();
