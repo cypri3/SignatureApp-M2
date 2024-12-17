@@ -8,7 +8,10 @@ import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 public class PDFdata {
     private File file;
 
-    public PDFdata(String filePath) {
+    public PDFdata() {
+    }
+
+    public void setPathFile(String filePath) {
         this.file = new File(filePath);
     }
 
@@ -67,7 +70,7 @@ public class PDFdata {
         }
     }
 
-        public static byte[] readPDFAsBytes(File file) throws IOException {
+    public static byte[] readPDFAsBytes(File file) throws IOException {
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] fileBytes = new byte[(int) file.length()];
             fis.read(fileBytes);
