@@ -250,7 +250,7 @@ public class Projet {
                                 publicKey[1] = keyPair[3];
                                 break;
                         }
-                        newKeys(userId,selectedSignature)
+                        newKeys(userId, selectedSignature)
 
                         byte[] signature = signatureAlgorithm.sign(hashValue, privateKey);
                         System.out.println("Signature générée : " + new BigInteger(1, signature).toString(16));
