@@ -25,6 +25,7 @@ public class Projet {
     private static int userId;
 
     private static Signatures selectSignatureAlgorithm(String selectedSignature) {
+        System.out.println(selectedSignature);
         switch (selectedSignature) {
             case "BLS":
                 return new BLS01();
