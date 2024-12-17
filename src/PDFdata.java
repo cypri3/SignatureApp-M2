@@ -11,8 +11,12 @@ public class PDFdata {
     public PDFdata() {
     }
 
-    public void setPathFile(String filePath) {
-        this.file = new File(filePath);
+    public void setFile(File file) {
+        if (file != null && file.exists()) {
+            this.file = file;
+        } else {
+            System.out.println("Fichier invalide ou inexistant.");
+        }
     }
 
     public void addMetadata(String key, byte[] valueBytes) {

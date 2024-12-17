@@ -85,8 +85,8 @@ public class PKI {
             privateKey1 = Utils.bigIntToHex(keys[0]);
             publicKey1 = Utils.bigIntToHex(keys[1]);
             publicKey2 = Utils.bigIntToHex(keys[2]);
-        } 
-        if (typeKey.equals("BLS") || typeKey.equals("DSA")){
+        }
+        if (typeKey.equals("BLS") || typeKey.equals("DSA")) {
             privateKey1 = Utils.bigIntToHex(keys[0]);
             publicKey1 = Utils.bigIntToHex(keys[1]);
         }
@@ -149,7 +149,7 @@ public class PKI {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILENAME))) {
             String line;
             boolean isTargetUser = false;
-            
+
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
                 if (line.startsWith("<user>") && line.endsWith("</user>")) {
@@ -182,12 +182,13 @@ public class PKI {
                         }
                     }
                     reader.close();
+                    return publicK;
                 }
             }
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        return publicK;
+        return new BigInteger[0];
     }
 
     public static BigInteger[] getPrivateKey(int userId, String typeKey) {
@@ -229,12 +230,13 @@ public class PKI {
                         }
                     }
                     reader.close();
+                    return privateK;
                 }
             }
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
-        return privateK;
+        return new BigInteger[0];
     }
 
     // TODO supprimer
