@@ -181,10 +181,10 @@ public class PKI {
                             }
                         }
                     }
-                    reader.close();
-                    return publicK;
                 }
             }
+            reader.close();
+            return publicK;
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -229,32 +229,13 @@ public class PKI {
                             }
                         }
                     }
-                    reader.close();
-                    return privateK;
                 }
             }
+            reader.close();
+            return privateK;
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
         return new BigInteger[0];
-    }
-
-    // TODO supprimer
-    public static void main(String[] args) {
-        BigInteger privateKey1 = new BigInteger("108026688110");
-        BigInteger privateKey2 = new BigInteger("208026688110");
-        BigInteger publicKey1 = new BigInteger("123457458875");
-        BigInteger publicKey2 = new BigInteger("708026688110");
-        BigInteger[] keys = { privateKey1, privateKey2, publicKey1, publicKey2 };
-        int userId = PKI.newUser();
-        PKI.newKeys(userId, "DSA", keys);
-        BigInteger[] pk = PKI.getPublicKey(userId, "DSA");
-        BigInteger[] sk = PKI.getPrivateKey(userId, "DSA");
-        for (int i = 0; i < 2; i++) {
-            System.out.println(pk[i]);
-            System.out.println(sk[i]);
-        }
-        System.out.println(publicKey1.toString(16));
-        System.out.println(Utils.bigIntToHex(publicKey1));
     }
 }
