@@ -1,12 +1,9 @@
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.*;
-import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
@@ -18,11 +15,14 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 
 public class Projet {
+
     private static File selectedFile = null;
 
     private static int selectedUser;
-    private static int[] PublicKey;
-    private static int[] privateKey;
+    private static BigInteger[] publicKey;
+    private static BigInteger[] privateKey;
+    private static int keyLength;
+    private static int userId;
 
     private static Signatures selectSignatureAlgorithm(String selectedSignature) {
         switch (selectedSignature) {
@@ -56,7 +56,12 @@ public class Projet {
     }
 
     public static void main(String[] args) {
+        privateKey = new BigInteger[2];
+        publicKey = new BigInteger[2];
         JFrame frame = new JFrame("Signature App - Gestion de la PKI");
+        System.setProperty("file.encoding", "UTF-8");
+        java.nio.charset.Charset.defaultCharset();
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(700, 600);
 
@@ -204,47 +209,66 @@ public class Projet {
             } else {
                 try {
                     byte[] pdfBytes = PDFdata.readPDFAsBytes(selectedFile);
-        
+
                     String selectedSignature = (String) algoBox.getSelectedItem();
                     String selectedHash = (String) hashBox.getSelectedItem();
-        
+
                     Signatures signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
                     Hashs hashFunction = selectHashFunction(selectedHash);
-        
+
                     if (signatureAlgorithm != null && hashFunction != null) {
                         System.out.println("Algorithme de signature : " + selectedSignature);
                         System.out.println("Algorithme de hash : " + selectedHash);
-        
+
                         byte[] hashValue = null;
                         try {
-                            hashValue = hashFunction.hash(pdfBytes);  
+                            hashValue = hashFunction.hash(pdfBytes);
                         } catch (NoSuchAlgorithmException ex) {
                             ex.printStackTrace();
                             JOptionPane.showMessageDialog(frame,
                                     "Erreur d'algorithme de hachage : " + ex.getMessage(),
                                     "Erreur", JOptionPane.ERROR_MESSAGE);
-                            return; 
+                            return;
                         }
-        
+
                         BigInteger[] keyPair = signatureAlgorithm.keyGen();
-                        BigInteger[] privateKey = { keyPair[0] };
-                        BigInteger[] publicKey = { keyPair[1] };
-        
+                        keyLength = keyPair.length;
+                        switch (keyLength) {
+                            case 2:
+                                privateKey[0] = keyPair[0];
+                                publicKey[0] = keyPair[1];
+                                break;
+                            case 3:
+                                privateKey[0] = keyPair[0];
+                                publicKey[0] = keyPair[1];
+                                publicKey[1] = keyPair[2];
+                                break;
+                            default:
+                                privateKey[0] = keyPair[0];
+                                privateKey[1] = keyPair[1];
+                                publicKey[0] = keyPair[2];
+                                publicKey[1] = keyPair[3];
+                                break;
+                        }
+                        newKeys(userId,selectedSignature)
+
                         byte[] signature = signatureAlgorithm.sign(hashValue, privateKey);
                         System.out.println("Signature générée : " + new BigInteger(1, signature).toString(16));
-        
+
                         boolean isValid = signatureAlgorithm.verify(signature, hashValue, publicKey);
                         System.out.println("La signature est valide : " + isValid);
-                        
+
                         JOptionPane.showMessageDialog(frame,
                                 "Fichier signé avec l'algorithme : " + algoBox.getSelectedItem(),
                                 "Succès", JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(frame, "Algorithme de signature ou de hachage invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, "Algorithme de signature ou de hachage invalide", "Erreur",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (IOException err) {
                     err.printStackTrace();
-                    JOptionPane.showMessageDialog(frame, "Erreur lors de la lecture du fichier", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Erreur lors de la lecture du fichier", "Erreur",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

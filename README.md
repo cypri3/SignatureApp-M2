@@ -15,3 +15,23 @@
  jar tf lib/jpbc-plaf-2.0.0.jar | grep PairingFactory
  Pour les a.properties :
  https://github.com/chrizchow/JPBC-ABS2/blob/master/a.properties
+
+
+
+ Pour compiler en Linux : 
+  - make compile
+  - make run
+  - make clean
+  - make help
+
+Pour compiler en CMD :
+  - build.bat compile
+  - build.bat run
+  - build.bat clean
+  - build.bat help
+
+Pour compiler en PowerShell :
+  - .\build.ps1 compile
+  - .\build.ps1 run
+  - .\build.ps1 clean
+  - .\build.ps1 help

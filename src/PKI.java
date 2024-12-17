@@ -33,7 +33,7 @@ public class PKI {
                     "    <key>\n" +
                     "        <type>ECDSA</type>\n" +
                     "        <privateKey>" + null + "</privateKey>\n" +
-                    "        <publicKey>" + null + "</publicKey>\n" +
+                    "        <publicKey>" + null + "," + null + "</publicKey>\n" +
                     "    </key>\n" +
                     "</user>\n";
             buffered.write(newKey);
@@ -80,6 +80,10 @@ public class PKI {
             privateKey2 = Utils.bigIntToHex(keys[1]);
             publicKey1 = Utils.bigIntToHex(keys[2]);
             publicKey2 = Utils.bigIntToHex(keys[3]);
+        } else if (typeKey.equals("ECDSA")) {
+            privateKey1 = Utils.bigIntToHex(keys[0]);
+            publicKey1 = Utils.bigIntToHex(keys[1]);
+            publicKey2 = Utils.bigIntToHex(keys[2]);
         } else {
             privateKey1 = Utils.bigIntToHex(keys[0]);
             publicKey1 = Utils.bigIntToHex(keys[1]);
@@ -129,7 +133,7 @@ public class PKI {
                     writer.newLine();
                 }
                 writer.close();
-    
+
             } catch (IOException e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -202,7 +206,7 @@ public class PKI {
                 if (isTargetUser && line.startsWith("<type>" + typeKey + "</type>")) {
 
                     line = reader.readLine().trim();
-                    
+
                     if (line.startsWith("<privateKey>")) {
                         if (typeKey.equals("RSA")) {
                             String privateKeys = line.substring(12, line.indexOf("</privateKey>"));
@@ -228,18 +232,19 @@ public class PKI {
         }
         throw new IllegalArgumentException("Keys " + typeKey + " not found for userId: " + userId);
     }
-    //TODO supprimer
+
+    // TODO supprimer
     public static void main(String[] args) {
         BigInteger privateKey1 = new BigInteger("108026688110");
         BigInteger privateKey2 = new BigInteger("208026688110");
         BigInteger publicKey1 = new BigInteger("123457458875");
         BigInteger publicKey2 = new BigInteger("708026688110");
-        BigInteger[] keys = {privateKey1, privateKey2, publicKey1, publicKey2} ;
+        BigInteger[] keys = { privateKey1, privateKey2, publicKey1, publicKey2 };
         int userId = PKI.newUser();
         PKI.newKeys(userId, "DSA", keys);
         BigInteger[] pk = PKI.getPublicKey(userId, "DSA");
         BigInteger[] sk = PKI.getPrivateKey(userId, "DSA");
-        for (int i = 0 ; i<2; i++) {
+        for (int i = 0; i < 2; i++) {
             System.out.println(pk[i]);
             System.out.println(sk[i]);
         }
