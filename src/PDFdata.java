@@ -14,12 +14,19 @@ public class PDFdata {
     public void setFile(File file) {
         if (file != null && file.exists()) {
             this.file = file;
+            System.out.println("Fichier défini : " + file.getAbsolutePath());
         } else {
             System.out.println("Fichier invalide ou inexistant.");
         }
     }
+    
 
     public void addMetadata(String key, byte[] valueBytes) {
+        if (this.file == null) {
+            System.out.println("Erreur : Aucun fichier n'a été défini. Veuillez appeler setFile() avec un fichier valide.");
+            return;
+        }
+
         try (PDDocument document = PDDocument.load(file)) {
             String value = new String(valueBytes, java.nio.charset.StandardCharsets.UTF_8);
             PDDocumentInformation info = document.getDocumentInformation();

@@ -12,6 +12,8 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import it.unisa.dia.gas.crypto.jpbc.signature.bls01.params.BLS01PrivateKeyParameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.bls01.params.BLS01PublicKeyParameters;
 import it.unisa.dia.gas.jpbc.Element;
+
+import java.io.File;
 import java.math.BigInteger;
 import it.unisa.dia.gas.jpbc.Pairing;
 
@@ -35,25 +37,71 @@ public class BLS01 implements Signatures {
     }
 
     @Override
-    public byte[] sign(byte[] hash, BigInteger[] keys) {
-        BLS01PrivateKeyParameters privateKey = (BLS01PrivateKeyParameters) createPrivateKey(keys[0], 
-                (BLS01Parameters) PairingFactory.getPairingParameters("src/a.properties"));
-        return sign(new String(hash), privateKey);
+public byte[] sign(byte[] hash, BigInteger[] keys) {
+    BLS01ParametersGenerator setup = new BLS01ParametersGenerator();
+    try {
+        setup.init(PairingFactory.getPairingParameters("src/a.properties"));
+    } catch (Exception e) {
+        System.err.println("Erreur lors de l'initialisation des paramètres : " + e.getMessage());
+        return null;
     }
+
+    BLS01Parameters blsParams = setup.generateParameters();
+
+    BLS01PrivateKeyParameters privateKey;
+    try {
+        privateKey = (BLS01PrivateKeyParameters) createPrivateKey(keys[0], blsParams);
+    } catch (ClassCastException e) {
+        System.err.println("Erreur : Impossible de convertir les paramètres en BLS01PrivateKeyParameters.");
+        e.printStackTrace();
+        return null;
+    }
+
+    if (privateKey == null) {
+        System.err.println("Erreur : La clé privée n'a pas pu être initialisée.");
+        return null;
+    }
+
+    return signPerf(hash, privateKey);
+}
+
     
     @Override
     public boolean verify(byte[] signature, byte[] hash, BigInteger[] publicKey) {
-        BLS01PublicKeyParameters publicKeyParam = (BLS01PublicKeyParameters) createPublicKey(
-                bigIntegerToBytes(publicKey[1]), (BLS01Parameters) PairingFactory.getPairingParameters("src/a.properties"));
-        return verify(signature, new String(hash), publicKeyParam);
+        BLS01ParametersGenerator setup = new BLS01ParametersGenerator();
+        try {
+            setup.init(PairingFactory.getPairingParameters("src/a.properties"));
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'initialisation des paramètres : " + e.getMessage());
+            return false;
+        }
+
+        BLS01Parameters blsParams = setup.generateParameters();
+
+        BLS01PublicKeyParameters publicKeyParam;
+        try {
+            publicKeyParam = (BLS01PublicKeyParameters) createPublicKey(
+                    bigIntegerToBytes(publicKey[0]), blsParams);
+        } catch (ClassCastException e) {
+            System.err.println("Erreur : Impossible de convertir les paramètres en BLS01PublicKeyParameters.");
+            e.printStackTrace();
+            return false;
+        }
+
+        if (publicKeyParam == null) {
+            System.err.println("Erreur : La clé publique n'a pas pu être initialisée.");
+            return false;
+        }
+
+        return verifyPerf(signature, hash, publicKeyParam);
     }
 
-    public byte[] sign(String message, CipherParameters privateKey) {
-        byte[] bytes = message.getBytes();
+
+    public byte[] signPerf(byte [] hash, CipherParameters privateKey) {
 
         BLS01Signer signer = new BLS01Signer(new SHA256Digest());
         signer.init(true, privateKey);
-        signer.update(bytes, 0, bytes.length);
+        signer.update(hash, 0, hash.length);
 
         byte[] signature = null;
         try {
@@ -64,12 +112,11 @@ public class BLS01 implements Signatures {
         return signature;
     }
 
-    public boolean verify(byte[] signature, String message, CipherParameters publicKey) {
-        byte[] bytes = message.getBytes();
+    public boolean verifyPerf(byte[] signature, byte [] hash, CipherParameters publicKey) {
 
         BLS01Signer signer = new BLS01Signer(new SHA256Digest());
         signer.init(false, publicKey);
-        signer.update(bytes, 0, bytes.length);
+        signer.update(hash, 0, hash.length);
 
         return signer.verifySignature(signature);
     }

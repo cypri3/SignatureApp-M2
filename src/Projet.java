@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import javax.swing.*;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -25,7 +26,6 @@ public class Projet {
     private static int userId = -1;
 
     private static Signatures selectSignatureAlgorithm(String selectedSignature) {
-        System.out.println(selectedSignature);
         switch (selectedSignature) {
             case "BLS":
                 return new BLS01();
@@ -56,11 +56,72 @@ public class Projet {
         }
     }
 
+    private static BigInteger[] updateKey(String selectedSignature, Signatures signatureAlgorithm){
+        if (userId == -1) {
+            if (PKI.getUserId() < 1) {
+                PKI.newUser();
+            }
+            userId = 0;
+        }
+        publicKey = PKI.getPublicKey(userId, selectedSignature);
+        privateKey = PKI.getPrivateKey(userId, selectedSignature);
+        int publicLen = 0;
+        int privateLen = 0;
+        keyLength = 0;
+        if(publicKey != null){ 
+            publicLen = publicKey.length;
+            privateLen = privateKey.length;
+            keyLength = publicLen + privateLen;
+        }
+
+
+        BigInteger[] keyPair = new BigInteger[keyLength];
+        if(publicLen > 0){
+            System.arraycopy(privateKey, 0, keyPair, 0,privateLen );
+            System.arraycopy(publicKey, 0, keyPair, privateLen, publicLen);
+        }
+
+        System.out.println("Taille de la clé : " + (keyLength));
+        System.out.println("Type de signature : " + selectedSignature);
+
+        if (keyPair != null && keyPair.length == 0) {
+            keyPair = signatureAlgorithm.keyGen();
+            keyLength = keyPair.length;
+            PKI.newKeys(userId, selectedSignature, keyPair);
+        }
+        if (keyPair != null && keyPair.length > 0) {
+            switch (keyLength) {
+                case 2 -> {
+                    privateKey = new BigInteger[1];
+                    publicKey = new BigInteger[1];
+                    privateKey[0] = keyPair[0];
+                    publicKey[0] = keyPair[1];
+                }
+                case 3 -> {
+                    privateKey = new BigInteger[1];
+                    publicKey = new BigInteger[2];
+                    privateKey[0] = keyPair[0];
+                    publicKey[0] = keyPair[1];
+                    publicKey[1] = keyPair[2];
+                }
+                default -> {
+                    privateKey = new BigInteger[2];
+                    publicKey = new BigInteger[2];
+                    privateKey[0] = keyPair[0];
+                    privateKey[1] = keyPair[1];
+                    publicKey[0] = keyPair[2];
+                    publicKey[1] = keyPair[3];
+                }
+            }
+        } else {
+            System.out.println("Erreur: keyPair est null ou vide.");
+        }
+        return keyPair;
+    }
+
     public static void main(String[] args) {
-        privateKey = new BigInteger[2];
-        publicKey = new BigInteger[2];
         PDFdata PDFInstance = new PDFdata();
-        JFrame frame = new JFrame("Signature App - Gestion de la PKI");
+        JFrame frame = new JFrame("Signature App");
         System.setProperty("file.encoding", "UTF-8");
         java.nio.charset.Charset.defaultCharset();
 
@@ -70,6 +131,9 @@ public class Projet {
         // Panel principal
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
+        
+        JButton downloadButton = new JButton(" Télécharger la sortie  ");
+        downloadButton.setEnabled(false); // Désactivé par défaut
 
         // Zone d'affichage des fichiers
         JTextArea fileDisplayArea = new JTextArea("Aucun fichier sélectionné");
@@ -86,6 +150,7 @@ public class Projet {
                         selectedFile = files.get(0);
                         fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
                         PDFInstance.setFile(selectedFile);
+                        downloadButton.setEnabled(true);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -151,8 +216,6 @@ public class Projet {
         filePanel.setBorder(BorderFactory.createTitledBorder("Gestion des fichiers"));
 
         JButton selectFileButton = new JButton("Sélectionner un fichier");
-        JButton downloadButton = new JButton(" Télécharger la sortie  ");
-        downloadButton.setEnabled(false); // Désactivé par défaut
 
         selectFileButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
@@ -160,6 +223,7 @@ public class Projet {
             if (result == JFileChooser.APPROVE_OPTION) {
                 selectedFile = fileChooser.getSelectedFile();
                 fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
+                PDFInstance.setFile(selectedFile);
                 downloadButton.setEnabled(true); // Activer le bouton après sélection
             }
         });
@@ -216,8 +280,6 @@ public class Projet {
                     String selectedSignature = (String) algoBox.getSelectedItem();
                     String selectedHash = (String) hashBox.getSelectedItem();
 
-                    System.out.println(selectedSignature);
-
                     Signatures signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
                     Hashs hashFunction = selectHashFunction(selectedHash);
 
@@ -236,50 +298,12 @@ public class Projet {
                             return;
                         }
 
-                        publicKey = PKI.getPublicKey(userId, selectedSignature);
-                        privateKey = PKI.getPrivateKey(userId, selectedSignature);
+                        BigInteger[] keyPair = updateKey(selectedSignature,  signatureAlgorithm);
 
-                        BigInteger[] keyPair = new BigInteger[publicKey.length + privateKey.length];
-                        System.arraycopy(publicKey, 0, keyPair, 0, publicKey.length);
-                        System.arraycopy(privateKey, 0, keyPair, publicKey.length, privateKey.length);
+                        byte[] signature = signatureAlgorithm.sign(hashValue, keyPair);
 
-                        if (keyPair != null && keyPair.length == 0) {
-                            keyPair = signatureAlgorithm.keyGen();
-                            keyLength = keyPair.length;
-                            if (userId == -1) {
-                                if (PKI.getUserId() > 0) {
-                                    PKI.newUser();
-                                }
-                                userId = 0;
-                            }
-                            PKI.newKeys(userId, selectedSignature, keyPair);
-                        }
-                        if (keyPair != null && keyPair.length > 0) {
-                            switch (keyLength) {
-                                case 2:
-                                    privateKey[0] = keyPair[0];
-                                    publicKey[0] = keyPair[1];
-                                    break;
-                                case 3:
-                                    privateKey[0] = keyPair[0];
-                                    publicKey[0] = keyPair[1];
-                                    publicKey[1] = keyPair[2];
-                                    break;
-                                default:
-                                    privateKey[0] = keyPair[0];
-                                    privateKey[1] = keyPair[1];
-                                    publicKey[0] = keyPair[2];
-                                    publicKey[1] = keyPair[3];
-                                    break;
-                            }
-                        } else {
-                            System.out.println("Erreur: keyPair est null ou vide.");
-                        }
-
-                        byte[] signature = signatureAlgorithm.sign(hashValue, privateKey);
                         System.out.println("Signature générée : " + new BigInteger(1, signature).toString(16));
 
-                        System.out.println(signature.length);
                         PDFInstance.addMetadata("Signature", signature);
 
                         boolean isValid = signatureAlgorithm.verify(signature, hashValue, publicKey);
@@ -288,6 +312,9 @@ public class Projet {
                         JOptionPane.showMessageDialog(frame,
                                 "Fichier signé avec l'algorithme : " + algoBox.getSelectedItem(),
                                 "Succès", JOptionPane.INFORMATION_MESSAGE);
+                        
+                        privateKey = null;
+                        publicKey = null;
                     } else {
                         JOptionPane.showMessageDialog(frame, "Algorithme de signature ou de hachage invalide", "Erreur",
                                 JOptionPane.ERROR_MESSAGE);

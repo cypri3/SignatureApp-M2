@@ -165,7 +165,7 @@ public class PKI {
                         if (typeKey.equals("RSA") || typeKey.equals("ECDSA")) {
                             String publicKeys = line.substring(11, line.indexOf("</publicKey>"));
                             String[] publicKeyParts = publicKeys.split(",");
-                            if (publicKeyParts[0] != null) {
+                            if (((!"null".equals(publicKeyParts[0])) && publicKeyParts[0] != null)) {
                                 BigInteger publicKey1 = Utils.hexToBigInt(publicKeyParts[0]);
                                 BigInteger publicKey2 = Utils.hexToBigInt(publicKeyParts[1]);
                                 publicK = new BigInteger[2];
@@ -174,7 +174,7 @@ public class PKI {
                             }
                         } else {
                             String publicKey = line.substring(11, line.indexOf("</publicKey>"));
-                            if (publicKey != null) {
+                            if (!"null".equals(publicKey) && publicKey != null) {
                                 BigInteger publicKey1 = Utils.hexToBigInt(publicKey);
                                 publicK = new BigInteger[1];
                                 publicK[0] = publicKey1;
@@ -213,7 +213,7 @@ public class PKI {
                         if (typeKey.equals("RSA")) {
                             String privateKeys = line.substring(12, line.indexOf("</privateKey>"));
                             String[] privateKeyParts = privateKeys.split(",");
-                            if (privateKeyParts[0] != null) {
+                            if (!"null".equals(privateKeyParts[0]) && privateKeyParts[0] != null) {
                                 BigInteger privateKey1 = Utils.hexToBigInt(privateKeyParts[0]);
                                 BigInteger privateKey2 = Utils.hexToBigInt(privateKeyParts[1]);
                                 privateK = new BigInteger[2];
@@ -222,7 +222,7 @@ public class PKI {
                             }
                         } else {
                             String privateKey = line.substring(12, line.indexOf("</privateKey>"));
-                            if (privateKey != null) {
+                            if (!"null".equals(privateKey) && privateKey != null) {
                                 BigInteger privateKey1 = Utils.hexToBigInt(privateKey);
                                 privateK = new BigInteger[1];
                                 privateK[0] = privateKey1;
