@@ -33,6 +33,6 @@ public class RSA implements Signatures {
         BigInteger s = new BigInteger(signature);
         BigInteger verif = s.modPow(publicKey[0], publicKey[1]);
         BigInteger m = new BigInteger(message);
-        return verif.equals(m);
+        return verif.equals(m.mod(publicKey[1]));
     }
 }
