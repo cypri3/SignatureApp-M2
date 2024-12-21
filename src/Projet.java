@@ -167,6 +167,9 @@ public class Projet {
         panel.add(new JScrollPane(fileDisplayArea), BorderLayout.CENTER);
 
         // Gestion des utilisateurs
+        JLabel currentUserLabel = new JLabel("Utilisateur actuel : 0");
+        currentUserLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         userPanel.setBorder(BorderFactory.createTitledBorder("Gestion des utilisateurs"));
 
@@ -176,6 +179,7 @@ public class Projet {
         newUser.addActionListener(evt -> {
             userId = PKI.getUserId();
             selectedUser = PKI.newUser();
+            currentUserLabel.setText("Utilisateur actuel : " + selectedUser);
             JOptionPane.showMessageDialog(frame,
                     "Utilisateur '" + selectedUser + "' créé avec succès.",
                     "Succès", JOptionPane.INFORMATION_MESSAGE);
@@ -199,6 +203,7 @@ public class Projet {
 
                     if (userId <= sup && userId >= 0) {
                         selectedUser = userId;
+                        currentUserLabel.setText("Utilisateur actuel : " + selectedUser);
                         JOptionPane.showMessageDialog(frame,
                                 "Utilisateur avec ID " + userId + " chargé avec succès.",
                                 "Succès", JOptionPane.INFORMATION_MESSAGE);
@@ -217,6 +222,7 @@ public class Projet {
 
         userPanel.add(newUser);
         userPanel.add(loadUser);
+        userPanel.add(currentUserLabel);
 
         // Configuration des fichiers
         JPanel filePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
