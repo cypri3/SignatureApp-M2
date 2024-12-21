@@ -1,7 +1,6 @@
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Random;
 
 public class DSA implements Signatures {
@@ -36,7 +35,6 @@ public class DSA implements Signatures {
         } catch (IOException ex) {
         }
         byte[] signature = si.toByteArray();
-        System.out.println((Arrays.toString(s.toByteArray())));
         return signature;
     }
 
@@ -50,7 +48,6 @@ public class DSA implements Signatures {
         int len = signature.length;
         byte[] sign = new byte[len - 20];
         System.arraycopy(signature, 20, sign, 0, (len - 20));
-        System.out.println(Arrays.toString(sign));
         BigInteger s = new BigInteger(sign);
         if (r.compareTo(l) == 1 && s.compareTo(l) == 1) {
             return false;

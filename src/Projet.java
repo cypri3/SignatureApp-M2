@@ -1,19 +1,14 @@
-import java.io.File;
-import java.io.IOException;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.*;
+import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import javax.swing.*;
-import java.math.BigInteger;
 import java.util.Arrays;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import javax.swing.*;
 
 public class Projet {
 
@@ -27,32 +22,41 @@ public class Projet {
 
     private static Signatures selectSignatureAlgorithm(String selectedSignature) {
         switch (selectedSignature) {
-            case "BLS":
+            case "BLS" -> {
                 return new BLS01();
-            case "DSA":
+            }
+            case "DSA" -> {
                 return new DSA();
-            case "RSA":
+            }
+            case "RSA" -> {
                 return new RSA();
-            case "ECDSA":
+            }
+            case "ECDSA" -> {
                 return new ECDSA();
-            default:
+            }
+            default -> {
                 JOptionPane.showMessageDialog(null, "Algorithme de signature inconnu", "Erreur",
                         JOptionPane.ERROR_MESSAGE);
                 return null;
+            }
         }
     }
 
     private static Hashs selectHashFunction(String selectedHash) {
         switch (selectedHash) {
-            case "MD5":
+            case "MD5" -> {
                 return new MD5();
-            case "SHA1":
+            }
+            case "SHA1" -> {
                 return new SHA1();
-            case "SHA256":
+            }
+            case "SHA256" -> {
                 return new SHA256();
-            default:
+            }
+            default -> {
                 JOptionPane.showMessageDialog(null, "Algorithme de hash inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
                 return null;
+            }
         }
     }
 
@@ -175,10 +179,15 @@ public class Projet {
 
         JButton newUser = new JButton("Créer un utilisateur");
         JButton loadUser = new JButton("Charger un utilisateur existant");
+        
+        if(PKI.getUserId() < 2){
+            loadUser.setEnabled(false);
+        }
 
         newUser.addActionListener(evt -> {
             userId = PKI.getUserId();
             selectedUser = PKI.newUser();
+            loadUser.setEnabled(true);
             currentUserLabel.setText("Utilisateur actuel : " + selectedUser);
             JOptionPane.showMessageDialog(frame,
                     "Utilisateur '" + selectedUser + "' créé avec succès.",
@@ -188,7 +197,7 @@ public class Projet {
         loadUser.addActionListener(evt -> {
             String userInput = JOptionPane.showInputDialog(
                     userPanel,
-                    "Entrez l'ID de l'utilisateur à charger :",
+                    "Entrez l'ID de l'utilisateur à charger entre 0 et " + Integer.toString(PKI.getUserId() - 1) + " :",
                     "Chargement d'utilisateur",
                     JOptionPane.QUESTION_MESSAGE);
 
