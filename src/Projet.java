@@ -126,14 +126,19 @@ public class Projet {
         java.nio.charset.Charset.defaultCharset();
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(700, 600);
+        frame.setSize(750, 600);
 
         // Panel principal
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         
         JButton downloadButton = new JButton(" Télécharger la sortie  ");
+        JButton signButton = new JButton("Signer");
+        JButton verifyButton = new JButton("Vérifier");
         downloadButton.setEnabled(false); // Désactivé par défaut
+        signButton.setEnabled(false);
+        verifyButton.setEnabled(false);
+        
 
         // Zone d'affichage des fichiers
         JTextArea fileDisplayArea = new JTextArea("Aucun fichier sélectionné");
@@ -151,6 +156,8 @@ public class Projet {
                         fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
                         PDFInstance.setFile(selectedFile);
                         downloadButton.setEnabled(true);
+                        signButton.setEnabled(true);
+                        verifyButton.setEnabled(true);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -167,6 +174,7 @@ public class Projet {
         JButton loadUser = new JButton("Charger un utilisateur existant");
 
         newUser.addActionListener(evt -> {
+            userId = PKI.getUserId();
             selectedUser = PKI.newUser();
             JOptionPane.showMessageDialog(frame,
                     "Utilisateur '" + selectedUser + "' créé avec succès.",
@@ -224,7 +232,9 @@ public class Projet {
                 selectedFile = fileChooser.getSelectedFile();
                 fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
                 PDFInstance.setFile(selectedFile);
-                downloadButton.setEnabled(true); // Activer le bouton après sélection
+                downloadButton.setEnabled(true);
+                signButton.setEnabled(true);
+                verifyButton.setEnabled(true);
             }
         });
 
@@ -263,10 +273,9 @@ public class Projet {
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.setBorder(BorderFactory.createTitledBorder("Opérations de signature"));
 
-        JComboBox<String> algoBox = new JComboBox<>(new String[] { "BLS", "DSA", "RSA", "ECDSA" });
+        JComboBox<String> algoBox = new JComboBox<>(new String[] { "DSA", "RSA", "ECDSA" }); // "BLS"
         JComboBox<String> hashBox = new JComboBox<>(new String[] { "MD5", "SHA1", "SHA256" });
-        JButton signButton = new JButton("Signer");
-        JButton verifyButton = new JButton("Vérifier");
+
 
         signButton.addActionListener(e -> {
             if (selectedFile == null) {
@@ -275,6 +284,9 @@ public class Projet {
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } else {
                 try {
+                    PDFInstance.removeMetadata("Signature"); // Remise à nu de notre PDF
+
+
                     byte[] pdfBytes = PDFdata.readPDFAsBytes(selectedFile);
 
                     String selectedSignature = (String) algoBox.getSelectedItem();
@@ -287,7 +299,7 @@ public class Projet {
                         System.out.println("Algorithme de signature : " + selectedSignature);
                         System.out.println("Algorithme de hash : " + selectedHash);
 
-                        byte[] hashValue = null;
+                        byte[] hashValue;
                         try {
                             hashValue = hashFunction.hash(pdfBytes);
                         } catch (NoSuchAlgorithmException ex) {
@@ -302,6 +314,9 @@ public class Projet {
 
                         byte[] signature = signatureAlgorithm.sign(hashValue, keyPair);
 
+                        System.out.println("La signature est  : "+ Arrays.toString(signature));
+                        System.out.println("La clé publique est : "+ publicKey[0]);
+
                         System.out.println("Signature générée : " + new BigInteger(1, signature).toString(16));
 
                         PDFInstance.addMetadata("Signature", signature);
@@ -309,12 +324,12 @@ public class Projet {
                         boolean isValid = signatureAlgorithm.verify(signature, hashValue, publicKey);
                         System.out.println("La signature est valide : " + isValid);
 
+                        privateKey = null;
+                        publicKey = null;
+
                         JOptionPane.showMessageDialog(frame,
                                 "Fichier signé avec l'algorithme : " + algoBox.getSelectedItem(),
                                 "Succès", JOptionPane.INFORMATION_MESSAGE);
-                        
-                        privateKey = null;
-                        publicKey = null;
                     } else {
                         JOptionPane.showMessageDialog(frame, "Algorithme de signature ou de hachage invalide", "Erreur",
                                 JOptionPane.ERROR_MESSAGE);
@@ -333,9 +348,67 @@ public class Projet {
                         "Aucun fichier sélectionné. Veuillez en sélectionner un avant de vérifier.",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(frame,
-                        "Signature vérifiée avec succès pour le fichier sélectionné.",
-                        "Succès", JOptionPane.INFORMATION_MESSAGE);
+                byte[] pdfBytes;
+                try {
+
+                    String selectedSignature = (String) algoBox.getSelectedItem();
+                    String selectedHash = (String) hashBox.getSelectedItem();
+
+                    Signatures signatureAlgorithm = selectSignatureAlgorithm(selectedSignature);
+                    Hashs hashFunction = selectHashFunction(selectedHash);
+
+                    if (signatureAlgorithm != null && hashFunction != null) {
+                        System.out.println("Algorithme de signature : " + selectedSignature);
+                        System.out.println("Algorithme de hash : " + selectedHash);
+
+                        updateKey(selectedSignature,  signatureAlgorithm);
+
+                        byte[] signature = PDFInstance.getMetadata("Signature");
+                        PDFInstance.removeMetadata("Signature");
+
+                        byte[] hashValue;
+                        
+                        pdfBytes = PDFdata.readPDFAsBytes(selectedFile);
+                        try {
+                            hashValue = hashFunction.hash(pdfBytes);
+                        } catch (NoSuchAlgorithmException ex) {
+                            ex.printStackTrace();
+                            JOptionPane.showMessageDialog(frame,
+                                    "Erreur d'algorithme de hachage : " + ex.getMessage(),
+                                    "Erreur", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+
+                        boolean isValid = signatureAlgorithm.verify(signature, hashValue, publicKey);
+                        System.out.println("La signature est  : "+ Arrays.toString(signature));
+                        System.out.println("La clé publique est : "+ publicKey[0]);
+
+                        PDFInstance.addMetadata("Signature", signature);
+                        privateKey = null;
+                        publicKey = null;
+                        System.out.println("La signature est valide : " + isValid);
+
+                        if(isValid){
+                            
+                            JOptionPane.showMessageDialog(frame,
+                            "La signature est valide.",
+                            "Erreur", JOptionPane.INFORMATION_MESSAGE);
+    
+                            }else{
+                                JOptionPane.showMessageDialog(frame,
+                                "La signature est invalide.",
+                                "Succès", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Algorithme de signature ou de hachage invalide", "Erreur",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+
+                } catch (IOException err) {
+                    err.printStackTrace();
+                    JOptionPane.showMessageDialog(frame, "Erreur lors de la lecture du fichier", "Erreur",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 

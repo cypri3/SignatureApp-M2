@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+import java.util.Base64;
 
 public class PDFdata {
     private File file;
@@ -26,11 +27,11 @@ public class PDFdata {
             System.out.println("Erreur : Aucun fichier n'a été défini. Veuillez appeler setFile() avec un fichier valide.");
             return;
         }
-
+    
         try (PDDocument document = PDDocument.load(file)) {
-            String value = new String(valueBytes, java.nio.charset.StandardCharsets.UTF_8);
+            String base64Value = Base64.getEncoder().encodeToString(valueBytes);
             PDDocumentInformation info = document.getDocumentInformation();
-            info.setCustomMetadataValue(key, value);
+            info.setCustomMetadataValue(key, base64Value);
             document.setDocumentInformation(info);
             document.save(file);
             System.out.println("Mise à jour des métadonnées réussie !");
@@ -42,9 +43,9 @@ public class PDFdata {
     public byte[] getMetadata(String key) {
         try (PDDocument document = PDDocument.load(file)) {
             PDDocumentInformation info = document.getDocumentInformation();
-            String value = info.getCustomMetadataValue(key);
-            if (value != null) {
-                return value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            String base64Value = info.getCustomMetadataValue(key);
+            if (base64Value != null) {
+                return Base64.getDecoder().decode(base64Value);
             } else {
                 return new byte[0];
             }
