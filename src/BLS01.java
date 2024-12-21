@@ -13,148 +13,94 @@ import it.unisa.dia.gas.crypto.jpbc.signature.bls01.params.BLS01PrivateKeyParame
 import it.unisa.dia.gas.crypto.jpbc.signature.bls01.params.BLS01PublicKeyParameters;
 import it.unisa.dia.gas.jpbc.Element;
 
-import java.io.File;
 import java.math.BigInteger;
 import it.unisa.dia.gas.jpbc.Pairing;
-
 public class BLS01 implements Signatures {
 
     @Override
     public BigInteger[] keyGen() {
+        System.out.println("=== Début de keyGen ===");
+
+        // Initialisation des paramètres
         BLS01ParametersGenerator setup = new BLS01ParametersGenerator();
         setup.init(PairingFactory.getPairingParameters("src/a.properties"));
+        System.out.println("Paramètres de pairing générés.");
 
+        // Génération des clés
         BLS01KeyPairGenerator keyGen = new BLS01KeyPairGenerator();
         keyGen.init(new BLS01KeyGenerationParameters(null, setup.generateParameters()));
-
         AsymmetricCipherKeyPair keyPair = keyGen.generateKeyPair();
-        
-        BigInteger privateKey = extractPrivateKey(keyPair.getPrivate());
-        byte[] publicKey = extractPublicKey(keyPair.getPublic());
-        BigInteger publicKeyBigInt = bytesToBigInteger(publicKey);
 
-        return new BigInteger[]{privateKey, publicKeyBigInt};
+        // Extraction des clés
+        BigInteger privateKey = ((BLS01PrivateKeyParameters) keyPair.getPrivate()).getSk().toBigInteger();
+        byte[] publicKeyBytes = ((BLS01PublicKeyParameters) keyPair.getPublic()).getPk().toBytes();
+        BigInteger publicKey = new BigInteger(1, publicKeyBytes);
+
+        System.out.println("Clé privée générée : " + privateKey);
+        System.out.println("Clé publique générée : " + publicKey);
+
+        System.out.println("=== Fin de keyGen ===");
+        return new BigInteger[]{privateKey, publicKey};
     }
 
     @Override
-public byte[] sign(byte[] hash, BigInteger[] keys) {
-    BLS01ParametersGenerator setup = new BLS01ParametersGenerator();
-    try {
-        setup.init(PairingFactory.getPairingParameters("src/a.properties"));
-    } catch (Exception e) {
-        System.err.println("Erreur lors de l'initialisation des paramètres : " + e.getMessage());
-        return null;
-    }
+    public byte[] sign(byte[] hash, BigInteger[] keys) {
+        System.out.println("=== Début de sign ===");
+        System.out.println("Hash à signer : " + new BigInteger(1, hash));
+        System.out.println("Clé privée utilisée : " + keys[0]);
 
-    BLS01Parameters blsParams = setup.generateParameters();
-
-    BLS01PrivateKeyParameters privateKey;
-    try {
-        privateKey = (BLS01PrivateKeyParameters) createPrivateKey(keys[0], blsParams);
-    } catch (ClassCastException e) {
-        System.err.println("Erreur : Impossible de convertir les paramètres en BLS01PrivateKeyParameters.");
-        e.printStackTrace();
-        return null;
-    }
-
-    if (privateKey == null) {
-        System.err.println("Erreur : La clé privée n'a pas pu être initialisée.");
-        return null;
-    }
-
-    return signPerf(hash, privateKey);
-}
-
-    
-    @Override
-    public boolean verify(byte[] signature, byte[] hash, BigInteger[] publicKey) {
+        // Initialisation des paramètres
         BLS01ParametersGenerator setup = new BLS01ParametersGenerator();
-        try {
-            setup.init(PairingFactory.getPairingParameters("src/a.properties"));
-        } catch (Exception e) {
-            System.err.println("Erreur lors de l'initialisation des paramètres : " + e.getMessage());
-            return false;
-        }
-
+        setup.init(PairingFactory.getPairingParameters("src/a.properties"));
         BLS01Parameters blsParams = setup.generateParameters();
 
-        BLS01PublicKeyParameters publicKeyParam;
-        try {
-            publicKeyParam = (BLS01PublicKeyParameters) createPublicKey(
-                    bigIntegerToBytes(publicKey[0]), blsParams);
-        } catch (ClassCastException e) {
-            System.err.println("Erreur : Impossible de convertir les paramètres en BLS01PublicKeyParameters.");
-            e.printStackTrace();
-            return false;
-        }
+        // Création de la clé privée
+        Pairing pairing = PairingFactory.getPairing(blsParams.getParameters());
+        CipherParameters privateKey = new BLS01PrivateKeyParameters(blsParams, pairing.getZr().newElement(keys[0]));
 
-        if (publicKeyParam == null) {
-            System.err.println("Erreur : La clé publique n'a pas pu être initialisée.");
-            return false;
-        }
-
-        return verifyPerf(signature, hash, publicKeyParam);
-    }
-
-
-    public byte[] signPerf(byte [] hash, CipherParameters privateKey) {
-
+        // Signature
         BLS01Signer signer = new BLS01Signer(new SHA256Digest());
         signer.init(true, privateKey);
         signer.update(hash, 0, hash.length);
 
-        byte[] signature = null;
         try {
-            signature = signer.generateSignature();
+            byte[] signature = signer.generateSignature();
+            System.out.println("Signature générée : " + new BigInteger(1, signature));
+            System.out.println("=== Fin de sign ===");
+            return signature;
         } catch (CryptoException e) {
-            throw new RuntimeException(e);
+            System.err.println("Erreur lors de la génération de la signature : " + e.getMessage());
+            throw new RuntimeException("Erreur lors de la génération de la signature", e);
         }
-        return signature;
     }
 
-    public boolean verifyPerf(byte[] signature, byte [] hash, CipherParameters publicKey) {
+    @Override
+    public boolean verify(byte[] signature, byte[] hash, BigInteger[] publicKey) {
+        System.out.println("=== Début de verify ===");
+        System.out.println("Signature à vérifier : " + new BigInteger(1, signature));
+        System.out.println("Hash à vérifier : " + new BigInteger(1, hash));
+        System.out.println("Clé publique utilisée : " + publicKey[0]);
 
+        // Initialisation des paramètres
+        BLS01ParametersGenerator setup = new BLS01ParametersGenerator();
+        setup.init(PairingFactory.getPairingParameters("src/a.properties"));
+        BLS01Parameters blsParams = setup.generateParameters();
+
+        // Recréation de la clé publique
+        Pairing pairing = PairingFactory.getPairing(blsParams.getParameters());
+        Element g2Element = pairing.getG2().newElement();
+        g2Element.setFromBytes(publicKey[0].toByteArray());
+        System.out.println("g2Element (toString) : " + g2Element);
+        CipherParameters publicKeyParam = new BLS01PublicKeyParameters(blsParams, g2Element);
+
+        // Vérification
         BLS01Signer signer = new BLS01Signer(new SHA256Digest());
-        signer.init(false, publicKey);
+        signer.init(false, publicKeyParam);
         signer.update(hash, 0, hash.length);
 
-        return signer.verifySignature(signature);
-    }
-
-    public BigInteger extractPrivateKey(CipherParameters privateKey) {
-        if (!(privateKey instanceof BLS01PrivateKeyParameters)) {
-            throw new IllegalArgumentException("Invalid private key format");
-        }
-        BLS01PrivateKeyParameters priv = (BLS01PrivateKeyParameters) privateKey;
-        return priv.getSk().toBigInteger();
-    }
-
-    public byte[] extractPublicKey(CipherParameters publicKey) {
-        if (!(publicKey instanceof BLS01PublicKeyParameters)) {
-            throw new IllegalArgumentException("Invalid public key format");
-        }
-        BLS01PublicKeyParameters pub = (BLS01PublicKeyParameters) publicKey;
-        Element g2Element = pub.getPk();
-        return g2Element.toBytes(); 
-    }
-
-    public CipherParameters createPrivateKey(BigInteger sk, BLS01Parameters parameters) {
-        Pairing pairing = PairingFactory.getPairing(parameters.getParameters()); 
-        return new BLS01PrivateKeyParameters(parameters, pairing.getZr().newElement(sk));
-    }
-    
-    public CipherParameters createPublicKey(byte[] pkBytes, BLS01Parameters parameters) {
-        Pairing pairing = PairingFactory.getPairing(parameters.getParameters()); 
-        Element g2Element = pairing.getG2().newElement();
-        g2Element.setFromBytes(pkBytes); 
-        return new BLS01PublicKeyParameters(parameters, g2Element);
-    }
-    
-    public BigInteger bytesToBigInteger(byte[] bytes) {
-        return new BigInteger(1, bytes); 
-    }
-    
-    public byte[] bigIntegerToBytes(BigInteger bigInteger) {
-        return bigInteger.toByteArray();
+        boolean isValid = signer.verifySignature(signature);
+        System.out.println("Résultat de la vérification : " + isValid);
+        System.out.println("=== Fin de verify ===");
+        return isValid;
     }
 }
