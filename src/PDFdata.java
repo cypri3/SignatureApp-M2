@@ -15,16 +15,16 @@ public class PDFdata {
     public void setFile(File file) {
         if (file != null && file.exists()) {
             this.file = file;
-            System.out.println("Fichier défini : " + file.getAbsolutePath());
+            System.out.println("Defined file : " + file.getAbsolutePath());
         } else {
-            System.out.println("Fichier invalide ou inexistant.");
+            System.out.println("Invalid or inexisted file.");
         }
     }
     
 
     public void addMetadata(String key, byte[] valueBytes) {
         if (this.file == null) {
-            System.out.println("Erreur : Aucun fichier n'a été défini. Veuillez appeler setFile() avec un fichier valide.");
+            System.out.println("Error: No file has been defined. Please call the setFile() function with a valid file.");
             return;
         }
     
@@ -57,12 +57,12 @@ public class PDFdata {
     public void displayAllMetadata() {
         try (PDDocument document = PDDocument.load(file)) {
             PDDocumentInformation info = document.getDocumentInformation();
-            System.out.println("Métadonnées du document :");
-            System.out.println("Titre: " + info.getTitle());
-            System.out.println("Auteur: " + info.getAuthor());
-            System.out.println("Sujet: " + info.getSubject());
-            System.out.println("Créateur: " + info.getCreator());
-            System.out.println("Producteur: " + info.getProducer());
+            System.out.println("File's metadata :");
+            System.out.println("Title: " + info.getTitle());
+            System.out.println("Author: " + info.getAuthor());
+            System.out.println("Subject: " + info.getSubject());
+            System.out.println("Creator: " + info.getCreator());
+            System.out.println("Producer: " + info.getProducer());
             System.out.println("Signature: " + getMetadata("Signature"));
         } catch (IOException e) {
             e.printStackTrace();
