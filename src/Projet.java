@@ -34,9 +34,6 @@ public class Projet {
 
     private static Signatures selectSignatureAlgorithm(String selectedSignature) {
         switch (selectedSignature) {
-            case "BLS" -> {
-                return new BLS01();
-            }
             case "DSA" -> {
                 return new DSA();
             }
@@ -333,7 +330,7 @@ NB Signer modifie le fichier et écrase une signature existante.
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.setBorder(BorderFactory.createTitledBorder("Opérations de signature"));
 
-        JComboBox<String> algoBox = new JComboBox<>(new String[] { "DSA", "RSA", "ECDSA" }); // "BLS"
+        JComboBox<String> algoBox = new JComboBox<>(new String[] { "DSA", "RSA", "ECDSA" });
         JComboBox<String> hashBox = new JComboBox<>(new String[] { "MD5", "SHA1", "SHA256" });
 
 
