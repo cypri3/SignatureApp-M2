@@ -22,7 +22,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
-public class Projet {
+public class SignatureApp {
 
     private static File selectedFile = null;
 
@@ -44,7 +44,7 @@ public class Projet {
                 return new ECDSA();
             }
             default -> {
-                JOptionPane.showMessageDialog(null, "Algorithme de signature inconnu", "Erreur",
+                JOptionPane.showMessageDialog(null, "Unknown signature algorithm", "Error",
                         JOptionPane.ERROR_MESSAGE);
                 return null;
             }
@@ -63,7 +63,7 @@ public class Projet {
                 return new SHA256();
             }
             default -> {
-                JOptionPane.showMessageDialog(null, "Algorithme de hash inconnu", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Unknown hash function", "Error", JOptionPane.ERROR_MESSAGE);
                 return null;
             }
         }
@@ -124,7 +124,7 @@ public class Projet {
                 }
             }
         } else {
-            System.out.println("Erreur: keyPair est null ou vide.");
+            System.out.println("Error: keyPair is null or empty.");
         }
         return keyPair;
     }
@@ -142,14 +142,14 @@ public class Projet {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         
-        JButton signButton = new JButton("Signer");
-        JButton verifyButton = new JButton("Vérifier");
+        JButton signButton = new JButton("Sign");
+        JButton verifyButton = new JButton("Verify");
         signButton.setEnabled(false);
         verifyButton.setEnabled(false);
         
 
         // Zone d'affichage des fichiers
-        JTextArea fileDisplayArea = new JTextArea("Aucun fichier sélectionné");
+        JTextArea fileDisplayArea = new JTextArea("No selected file");
         fileDisplayArea.setEditable(false);
         fileDisplayArea.setLineWrap(true);
         fileDisplayArea.setWrapStyleWord(true);
@@ -167,21 +167,21 @@ public class Projet {
                         String fileName = file.getName().toLowerCase();
                         if (fileName.endsWith(".pdf")) {
                             selectedFile = file;
-                            fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
+                            fileDisplayArea.setText("Selected file : " + selectedFile.getAbsolutePath());
                             PDFInstance.setFile(selectedFile);
                             signButton.setEnabled(true);
                             verifyButton.setEnabled(true);
                         } else {
                             JOptionPane.showMessageDialog(frame, 
-                                "Seuls les fichiers JPG et PDF sont acceptés.", 
-                                "Type de fichier invalide", 
+                                "Only PDF files are handled.", 
+                                "Invalid file's type", 
                                 JOptionPane.ERROR_MESSAGE);
                         }
                     }
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame, 
-                    "Erreur lors de la lecture de fichier.", 
-                    "Erreur", 
+                    "Error during the file's opening.", 
+                    "Error", 
                     JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -190,14 +190,14 @@ public class Projet {
         panel.add(new JScrollPane(fileDisplayArea), BorderLayout.CENTER);
 
         // Gestion des utilisateurs
-        JLabel currentUserLabel = new JLabel("Utilisateur actuel : 0");
+        JLabel currentUserLabel = new JLabel("Actual user : 0");
         currentUserLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        userPanel.setBorder(BorderFactory.createTitledBorder("Gestion des utilisateurs"));
+        userPanel.setBorder(BorderFactory.createTitledBorder("Users management"));
 
-        JButton newUser = new JButton("Créer un utilisateur");
-        JButton loadUser = new JButton("Charger un utilisateur existant");
+        JButton newUser = new JButton("Create a user");
+        JButton loadUser = new JButton("Load an existing user");
         
         if(PKI.getUserId() < 2){
             loadUser.setEnabled(false);
@@ -207,23 +207,23 @@ public class Projet {
             userId = PKI.getUserId();
             selectedUser = PKI.newUser();
             loadUser.setEnabled(true);
-            currentUserLabel.setText("Utilisateur actuel : " + selectedUser);
+            currentUserLabel.setText("Actual user : " + selectedUser);
             JOptionPane.showMessageDialog(frame,
-                    "Utilisateur '" + selectedUser + "' créé avec succès.",
-                    "Succès", JOptionPane.INFORMATION_MESSAGE);
+                    "User '" + selectedUser + "' has been successfully created.",
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
         });
 
         loadUser.addActionListener(evt -> {
             String userInput = JOptionPane.showInputDialog(
                     userPanel,
-                    "Entrez l'ID de l'utilisateur à charger entre 0 et " + Integer.toString(PKI.getUserId() - 1) + " :",
-                    "Chargement d'utilisateur",
+                    "Enter the user's ID, value bewtween 0 and " + Integer.toString(PKI.getUserId() - 1) + " :",
+                    "User's loading",
                     JOptionPane.QUESTION_MESSAGE);
 
             if (userInput == null || userInput.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(frame,
-                        "ID d'utilisateur invalide. Veuillez réessayer.",
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                        "Invalid user's ID. Please retry",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 try {
                     userId = Integer.parseInt(userInput.trim());
@@ -231,19 +231,19 @@ public class Projet {
 
                     if (userId <= sup && userId >= 0) {
                         selectedUser = userId;
-                        currentUserLabel.setText("Utilisateur actuel : " + selectedUser);
+                        currentUserLabel.setText("Actual user : " + selectedUser);
                         JOptionPane.showMessageDialog(frame,
-                                "Utilisateur avec ID " + userId + " chargé avec succès.",
-                                "Succès", JOptionPane.INFORMATION_MESSAGE);
+                                "User with ID " + userId + " successfully loaded.",
+                                "success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(frame,
-                                "ID d'utilisateur invalide. Veuillez entrer un nombre entier entre 0 et " + sup,
-                                "Erreur", JOptionPane.ERROR_MESSAGE);
+                                "Invalid user's ID. Please enter an integer between 0 and " + sup,
+                                "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(frame,
-                            "ID d'utilisateur invalide. Veuillez entrer un nombre entier.",
-                            "Erreur", JOptionPane.ERROR_MESSAGE);
+                            "Invalid user's ID. Please enter an integer.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -255,10 +255,10 @@ public class Projet {
         // Configuration des fichiers
         JPanel filePanel = new JPanel();
         filePanel.setLayout(new BoxLayout(filePanel, BoxLayout.Y_AXIS));
-        filePanel.setBorder(BorderFactory.createTitledBorder("Gestion des fichiers"));
+        filePanel.setBorder(BorderFactory.createTitledBorder("Files management"));
 
         // Bouton pour sélectionner un fichier
-        JButton selectFileButton = new JButton("Sélectionner un fichier");
+        JButton selectFileButton = new JButton("Select a file");
 
         selectFileButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
@@ -271,7 +271,7 @@ public class Projet {
 
                 @Override
                 public String getDescription() {
-                    return "Fichiers PDF (*.pdf)";
+                    return "PDF files (*.pdf)";
                 }
             });
 
@@ -281,14 +281,14 @@ public class Projet {
                 String fileName = file.getName().toLowerCase();
                 if (fileName.endsWith(".pdf")) {
                     selectedFile = file;
-                    fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
+                    fileDisplayArea.setText("Selected file : " + selectedFile.getAbsolutePath());
                     PDFInstance.setFile(selectedFile);
                     signButton.setEnabled(true);
                     verifyButton.setEnabled(true);
                 } else {
                     JOptionPane.showMessageDialog(frame, 
-                        "Seuls les fichiers JPG et PDF sont acceptés.", 
-                        "Type de fichier invalide", 
+                        "Only PDF files are handled.", 
+                                "Invalid file's type", 
                         JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -304,21 +304,21 @@ public class Projet {
         tutorialArea.setLineWrap(true);
         tutorialArea.setWrapStyleWord(true);
         tutorialArea.setText("""
-1. Créez ou chargez un utilisateur (0 par défaut).
+1. Create or load a user (default : 0).
 
-2. Glissez-déposez ou sélectionnez un fichier PDF.
+2. Drag and drop or select a PDF file.
 
-3. Paramétrer le type de signature et de hachage.
+3. Select the signature algorithm and hash function.
 
-4. Signez et vérifiez vos documents.
+4. Sign and verify your files.
 
-NB Signer modifie le fichier et écrase une signature existante.
+NB The sign function will modify the file and erase an already existing signature.
 """);
 
 
         
         JScrollPane scrollPane = new JScrollPane(tutorialArea);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Tutoriel général"));
+        scrollPane.setBorder(BorderFactory.createTitledBorder("General tutorial"));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         filePanel.add(scrollPane);
@@ -328,7 +328,7 @@ NB Signer modifie le fichier et écrase une signature existante.
         // Opérations sur la signature
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.setBorder(BorderFactory.createTitledBorder("Opérations de signature"));
+        buttonPanel.setBorder(BorderFactory.createTitledBorder("Signature's parameters"));
 
         JComboBox<String> algoBox = new JComboBox<>(new String[] { "DSA", "RSA", "ECDSA" });
         JComboBox<String> hashBox = new JComboBox<>(new String[] { "MD5", "SHA1", "SHA256" });
@@ -337,8 +337,8 @@ NB Signer modifie le fichier et écrase une signature existante.
         signButton.addActionListener(e -> {
             if (selectedFile == null) {
                 JOptionPane.showMessageDialog(frame,
-                        "Aucun fichier sélectionné. Veuillez en sélectionner un avant de signer.",
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                        "No file selected. Please select a file before signing it.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 try {
                     PDFInstance.removeMetadata("Signature"); // Remise à nu de notre PDF
@@ -359,8 +359,8 @@ NB Signer modifie le fichier et écrase une signature existante.
                             hashValue = hashFunction.hash(pdfBytes);
                         } catch (NoSuchAlgorithmException ex) {
                             JOptionPane.showMessageDialog(frame,
-                                    "Erreur d'algorithme de hachage : " + ex.getMessage(),
-                                    "Erreur", JOptionPane.ERROR_MESSAGE);
+                                    "Hash function's error : " + ex.getMessage(),
+                                    "Error", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
 
@@ -372,14 +372,14 @@ NB Signer modifie le fichier et écrase une signature existante.
                         publicKey = null;
 
                         JOptionPane.showMessageDialog(frame,
-                                "Fichier signé avec l'algorithme : " + algoBox.getSelectedItem(),
-                                "Succès", JOptionPane.INFORMATION_MESSAGE);
+                                "The file has been signed with : " + algoBox.getSelectedItem(),
+                                "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(frame, "Algorithme de signature ou de hachage invalide", "Erreur",
+                        JOptionPane.showMessageDialog(frame, "Invalid signature algorithm or hash function", "Error",
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (IOException err) {
-                    JOptionPane.showMessageDialog(frame, "Erreur lors de la lecture du fichier", "Erreur",
+                    JOptionPane.showMessageDialog(frame, "Error during the file's opening.", "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -388,8 +388,8 @@ NB Signer modifie le fichier et écrase une signature existante.
         verifyButton.addActionListener(e -> {
             if (selectedFile == null) {
                 JOptionPane.showMessageDialog(frame,
-                        "Aucun fichier sélectionné. Veuillez en sélectionner un avant de vérifier.",
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                        "No file selected. Please select a file before verifying it.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 byte[] pdfBytes;
                 try {
@@ -414,8 +414,8 @@ NB Signer modifie le fichier et écrase une signature existante.
                             hashValue = hashFunction.hash(pdfBytes);
                         } catch (NoSuchAlgorithmException ex) {
                             JOptionPane.showMessageDialog(frame,
-                                    "Erreur d'algorithme de hachage : " + ex.getMessage(),
-                                    "Erreur", JOptionPane.ERROR_MESSAGE);
+                                    "Hash function's error : " + ex.getMessage(),
+                                    "Error", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
 
@@ -428,29 +428,29 @@ NB Signer modifie le fichier et écrase une signature existante.
                         if(isValid){
                             
                             JOptionPane.showMessageDialog(frame,
-                            "La signature est valide.",
-                            "Erreur", JOptionPane.INFORMATION_MESSAGE);
+                            "Valid signature.",
+                            "Error", JOptionPane.INFORMATION_MESSAGE);
     
                             }else{
                                 JOptionPane.showMessageDialog(frame,
-                                "La signature est invalide.",
-                                "Succès", JOptionPane.ERROR_MESSAGE);
+                                "Invalid signature.",
+                                "Success", JOptionPane.ERROR_MESSAGE);
                         }
                     } else {
-                        JOptionPane.showMessageDialog(frame, "Algorithme de signature ou de hachage invalide", "Erreur",
+                        JOptionPane.showMessageDialog(frame, "Invalid signature algorithm or hash function", "Error",
                                 JOptionPane.ERROR_MESSAGE);
                     }
 
                 } catch (IOException err) {
-                    JOptionPane.showMessageDialog(frame, "Erreur lors de la lecture du fichier", "Erreur",
+                    JOptionPane.showMessageDialog(frame, "Error during the file's opening.", "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        buttonPanel.add(new JLabel("Type de signature :"));
+        buttonPanel.add(new JLabel("Signature's type :"));
         buttonPanel.add(algoBox);
-        buttonPanel.add(new JLabel("Type de hashage :"));
+        buttonPanel.add(new JLabel("Hash's type :"));
         buttonPanel.add(hashBox);
         buttonPanel.add(signButton);
         buttonPanel.add(verifyButton);
