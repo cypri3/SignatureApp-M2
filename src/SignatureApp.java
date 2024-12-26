@@ -26,7 +26,6 @@ public class SignatureApp {
 
     private static File selectedFile = null;
 
-    private static int selectedUser;
     private static BigInteger[] publicKey;
     private static BigInteger[] privateKey;
     private static int keyLength;
@@ -167,7 +166,7 @@ public class SignatureApp {
                         String fileName = file.getName().toLowerCase();
                         if (fileName.endsWith(".pdf")) {
                             selectedFile = file;
-                            fileDisplayArea.setText("Selected file : " + selectedFile.getAbsolutePath());
+                            fileDisplayArea.setText("Selected file: " + selectedFile.getAbsolutePath());
                             PDFInstance.setFile(selectedFile);
                             signButton.setEnabled(true);
                             verifyButton.setEnabled(true);
@@ -190,13 +189,13 @@ public class SignatureApp {
         panel.add(new JScrollPane(fileDisplayArea), BorderLayout.CENTER);
 
         // Gestion des utilisateurs
-        JLabel currentUserLabel = new JLabel("Actual user : 0");
+        JLabel currentUserLabel = new JLabel("Actual user: 0");
         currentUserLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
         JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         userPanel.setBorder(BorderFactory.createTitledBorder("Users management"));
 
-        JButton newUser = new JButton("Create a user");
+        JButton newUser  = new JButton("        Create a user      ");
         JButton loadUser = new JButton("Load an existing user");
         
         if(PKI.getUserId() < 2){
@@ -204,19 +203,18 @@ public class SignatureApp {
         }
 
         newUser.addActionListener(evt -> {
-            userId = PKI.getUserId();
-            selectedUser = PKI.newUser();
+            userId = PKI.newUser();
             loadUser.setEnabled(true);
-            currentUserLabel.setText("Actual user : " + selectedUser);
+            currentUserLabel.setText("Actual user: " + userId);
             JOptionPane.showMessageDialog(frame,
-                    "User '" + selectedUser + "' has been successfully created.",
+                    "User '" + userId + "' has been successfully created.",
                     "Success", JOptionPane.INFORMATION_MESSAGE);
         });
 
         loadUser.addActionListener(evt -> {
             String userInput = JOptionPane.showInputDialog(
                     userPanel,
-                    "Enter the user's ID, value bewtween 0 and " + Integer.toString(PKI.getUserId() - 1) + " :",
+                    "Enter the user's ID, value bewtween 0 and " + Integer.toString(PKI.getUserId() - 1) + ":",
                     "User's loading",
                     JOptionPane.QUESTION_MESSAGE);
 
@@ -226,12 +224,12 @@ public class SignatureApp {
                         "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 try {
-                    userId = Integer.parseInt(userInput.trim());
+                    int tmpUserId = Integer.parseInt(userInput.trim());
                     int sup = PKI.getUserId() - 1;
 
-                    if (userId <= sup && userId >= 0) {
-                        selectedUser = userId;
-                        currentUserLabel.setText("Actual user : " + selectedUser);
+                    if (tmpUserId <= sup && tmpUserId >= 0) {
+                        userId = tmpUserId;
+                        currentUserLabel.setText("Actual user: " + userId);
                         JOptionPane.showMessageDialog(frame,
                                 "User with ID " + userId + " successfully loaded.",
                                 "success", JOptionPane.INFORMATION_MESSAGE);
@@ -258,7 +256,7 @@ public class SignatureApp {
         filePanel.setBorder(BorderFactory.createTitledBorder("Files management"));
 
         // Bouton pour sélectionner un fichier
-        JButton selectFileButton = new JButton("Select a file");
+        JButton selectFileButton = new JButton("        Select a file       ");
 
         selectFileButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
@@ -281,7 +279,7 @@ public class SignatureApp {
                 String fileName = file.getName().toLowerCase();
                 if (fileName.endsWith(".pdf")) {
                     selectedFile = file;
-                    fileDisplayArea.setText("Selected file : " + selectedFile.getAbsolutePath());
+                    fileDisplayArea.setText("Selected file: " + selectedFile.getAbsolutePath());
                     PDFInstance.setFile(selectedFile);
                     signButton.setEnabled(true);
                     verifyButton.setEnabled(true);
@@ -304,7 +302,7 @@ public class SignatureApp {
         tutorialArea.setLineWrap(true);
         tutorialArea.setWrapStyleWord(true);
         tutorialArea.setText("""
-1. Create or load a user (default : 0).
+1. Create or load a user (default: 0).
 
 2. Drag and drop or select a PDF file.
 
@@ -359,7 +357,7 @@ NB The sign function will modify the file and erase an already existing signatur
                             hashValue = hashFunction.hash(pdfBytes);
                         } catch (NoSuchAlgorithmException ex) {
                             JOptionPane.showMessageDialog(frame,
-                                    "Hash function's error : " + ex.getMessage(),
+                                    "Hash function's error: " + ex.getMessage(),
                                     "Error", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
@@ -372,7 +370,7 @@ NB The sign function will modify the file and erase an already existing signatur
                         publicKey = null;
 
                         JOptionPane.showMessageDialog(frame,
-                                "The file has been signed with : " + algoBox.getSelectedItem(),
+                                "The file has been signed with: " + algoBox.getSelectedItem(),
                                 "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(frame, "Invalid signature algorithm or hash function", "Error",
@@ -414,7 +412,7 @@ NB The sign function will modify the file and erase an already existing signatur
                             hashValue = hashFunction.hash(pdfBytes);
                         } catch (NoSuchAlgorithmException ex) {
                             JOptionPane.showMessageDialog(frame,
-                                    "Hash function's error : " + ex.getMessage(),
+                                    "Hash function's error: " + ex.getMessage(),
                                     "Error", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
@@ -429,12 +427,12 @@ NB The sign function will modify the file and erase an already existing signatur
                             
                             JOptionPane.showMessageDialog(frame,
                             "Valid signature.",
-                            "Error", JOptionPane.INFORMATION_MESSAGE);
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
     
                             }else{
                                 JOptionPane.showMessageDialog(frame,
                                 "Invalid signature.",
-                                "Success", JOptionPane.ERROR_MESSAGE);
+                                "Error", JOptionPane.ERROR_MESSAGE);
                         }
                     } else {
                         JOptionPane.showMessageDialog(frame, "Invalid signature algorithm or hash function", "Error",
@@ -448,9 +446,9 @@ NB The sign function will modify the file and erase an already existing signatur
             }
         });
 
-        buttonPanel.add(new JLabel("Signature's type :"));
+        buttonPanel.add(new JLabel("Signature's type:"));
         buttonPanel.add(algoBox);
-        buttonPanel.add(new JLabel("Hash's type :"));
+        buttonPanel.add(new JLabel("Hash's type:"));
         buttonPanel.add(hashBox);
         buttonPanel.add(signButton);
         buttonPanel.add(verifyButton);

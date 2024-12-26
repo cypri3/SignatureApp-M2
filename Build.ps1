@@ -2,7 +2,7 @@
 $SRC_DIR = "src"
 $BIN_DIR = "bin"
 $LIB_DIR = "lib"
-$MAIN_CLASS = "Projet"
+$MAIN_CLASS = "SignatureApp"
 
 # Création du dossier bin s'il n'existe pas
 if (-Not (Test-Path $BIN_DIR)) {

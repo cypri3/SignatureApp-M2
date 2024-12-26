@@ -3,7 +3,7 @@ REM Définition des variables
 set SRC_DIR=src
 set BIN_DIR=bin
 set LIB_DIR=lib
-set MAIN_CLASS=Projet
+set MAIN_CLASS=SignatureApp
 
 REM Création du dossier bin s'il n'existe pas
 if not exist "%BIN_DIR%" (

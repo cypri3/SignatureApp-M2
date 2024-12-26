@@ -2,7 +2,7 @@
 SRC = src/*.java
 BIN = bin
 LIB = lib/*
-MAIN = Projet
+MAIN = SignatureApp
 
 # Règle par défaut : compile
 all: compile run
