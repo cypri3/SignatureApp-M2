@@ -97,9 +97,6 @@ public class Projet {
             System.arraycopy(publicKey, 0, keyPair, privateLen, publicLen);
         }
 
-        System.out.println("Taille de la clé : " + (keyLength));
-        System.out.println("Type de signature : " + selectedSignature);
-
         if (keyPair != null && keyPair.length == 0) {
             keyPair = signatureAlgorithm.keyGen();
             keyLength = keyPair.length;
@@ -268,6 +265,19 @@ public class Projet {
 
         selectFileButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
+
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.isDirectory() || file.getName().toLowerCase().endsWith(".pdf");
+                }
+
+                @Override
+                public String getDescription() {
+                    return "Fichiers PDF (*.pdf)";
+                }
+            });
+
             int result = fileChooser.showOpenDialog(frame);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();

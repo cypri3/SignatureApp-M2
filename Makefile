@@ -5,7 +5,7 @@ LIB = lib/*
 MAIN = Projet
 
 # Règle par défaut : compile
-all: compile
+all: compile run
 
 # Compilation des fichiers source
 compile:
