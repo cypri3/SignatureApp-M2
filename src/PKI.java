@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PKI {
 
-    private static final String FILENAME = "tests/pki.txt";
+    private static final String FILENAME = "bin/pki.txt";
 
     public static int newUser() {
         try (BufferedWriter buffered = new BufferedWriter(new FileWriter(FILENAME, true))) {
@@ -64,7 +64,6 @@ public class PKI {
             }
             return lastUserId + 1;
         } catch (IOException e) {
-            System.out.println("Error: " + e.getMessage());
         }
         return 0;
     }

@@ -34,7 +34,6 @@ public class PDFdata {
             info.setCustomMetadataValue(key, base64Value);
             document.setDocumentInformation(info);
             document.save(file);
-            System.out.println("Mise à jour des métadonnées réussie !");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -76,7 +75,6 @@ public class PDFdata {
             info.setCustomMetadataValue(key, null);
             document.setDocumentInformation(info);
             document.save(file);
-            System.out.println("Métadonnée supprimée avec succès !");
         } catch (IOException e) {
             e.printStackTrace();
         }
