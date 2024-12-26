@@ -1,14 +1,26 @@
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.*;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
 public class Projet {
 
@@ -136,10 +148,8 @@ public class Projet {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         
-        JButton downloadButton = new JButton(" Télécharger la sortie  ");
         JButton signButton = new JButton("Signer");
         JButton verifyButton = new JButton("Vérifier");
-        downloadButton.setEnabled(false); // Désactivé par défaut
         signButton.setEnabled(false);
         verifyButton.setEnabled(false);
         
@@ -150,24 +160,39 @@ public class Projet {
         fileDisplayArea.setLineWrap(true);
         fileDisplayArea.setWrapStyleWord(true);
         fileDisplayArea.setDropTarget(new DropTarget() {
+            @Override
+            @SuppressWarnings("UseSpecificCatch")
             public synchronized void drop(DropTargetDropEvent evt) {
                 try {
                     evt.acceptDrop(DnDConstants.ACTION_COPY);
+                    @SuppressWarnings("unchecked")
                     java.util.List<File> files = (java.util.List<File>) evt.getTransferable()
                             .getTransferData(DataFlavor.javaFileListFlavor);
                     if (!files.isEmpty()) {
-                        selectedFile = files.get(0);
-                        fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
-                        PDFInstance.setFile(selectedFile);
-                        downloadButton.setEnabled(true);
-                        signButton.setEnabled(true);
-                        verifyButton.setEnabled(true);
+                        File file = files.get(0);
+                        String fileName = file.getName().toLowerCase();
+                        if (fileName.endsWith(".pdf")) {
+                            selectedFile = file;
+                            fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
+                            PDFInstance.setFile(selectedFile);
+                            signButton.setEnabled(true);
+                            verifyButton.setEnabled(true);
+                        } else {
+                            JOptionPane.showMessageDialog(frame, 
+                                "Seuls les fichiers JPG et PDF sont acceptés.", 
+                                "Type de fichier invalide", 
+                                JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(frame, 
+                    "Erreur lors de la lecture de fichier.", 
+                    "Erreur", 
+                    JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
+        
         panel.add(new JScrollPane(fileDisplayArea), BorderLayout.CENTER);
 
         // Gestion des utilisateurs
@@ -234,54 +259,64 @@ public class Projet {
         userPanel.add(currentUserLabel);
 
         // Configuration des fichiers
-        JPanel filePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel filePanel = new JPanel();
         filePanel.setLayout(new BoxLayout(filePanel, BoxLayout.Y_AXIS));
         filePanel.setBorder(BorderFactory.createTitledBorder("Gestion des fichiers"));
 
+        // Bouton pour sélectionner un fichier
         JButton selectFileButton = new JButton("Sélectionner un fichier");
 
         selectFileButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             int result = fileChooser.showOpenDialog(frame);
             if (result == JFileChooser.APPROVE_OPTION) {
-                selectedFile = fileChooser.getSelectedFile();
-                fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
-                PDFInstance.setFile(selectedFile);
-                downloadButton.setEnabled(true);
-                signButton.setEnabled(true);
-                verifyButton.setEnabled(true);
-            }
-        });
-
-        downloadButton.addActionListener(e -> {
-            if (selectedFile == null) {
-                JOptionPane.showMessageDialog(frame,
-                        "Aucun fichier traité. Veuillez effectuer une opération avant de télécharger.",
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
-            } else {
-                JFileChooser saveChooser = new JFileChooser();
-                saveChooser.setDialogTitle("Enregistrer la sortie");
-                int result = saveChooser.showSaveDialog(frame);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    File outputFile = saveChooser.getSelectedFile();
-                    try {
-                        Files.copy(selectedFile.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        JOptionPane.showMessageDialog(frame,
-                                "Fichier enregistré avec succès à : " + outputFile.getAbsolutePath(),
-                                "Succès", JOptionPane.INFORMATION_MESSAGE);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        JOptionPane.showMessageDialog(frame,
-                                "Erreur lors de l'enregistrement.",
-                                "Erreur", JOptionPane.ERROR_MESSAGE);
-                    }
+                File file = fileChooser.getSelectedFile();
+                String fileName = file.getName().toLowerCase();
+                if (fileName.endsWith(".pdf")) {
+                    selectedFile = file;
+                    fileDisplayArea.setText("Fichier sélectionné : " + selectedFile.getAbsolutePath());
+                    PDFInstance.setFile(selectedFile);
+                    signButton.setEnabled(true);
+                    verifyButton.setEnabled(true);
+                } else {
+                    JOptionPane.showMessageDialog(frame, 
+                        "Seuls les fichiers JPG et PDF sont acceptés.", 
+                        "Type de fichier invalide", 
+                        JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
+        
 
         filePanel.add(selectFileButton);
         filePanel.add(Box.createVerticalStrut(10));
-        filePanel.add(downloadButton);
+
+        JTextArea tutorialArea = new JTextArea(5, 3);
+
+        tutorialArea.setEditable(false);
+        tutorialArea.setLineWrap(true);
+        tutorialArea.setWrapStyleWord(true);
+        tutorialArea.setText("""
+1. Créez ou chargez un utilisateur (0 par défaut).
+
+2. Glissez-déposez ou sélectionnez un fichier PDF.
+
+3. Paramétrer le type de signature et de hachage.
+
+4. Signez et vérifiez vos documents.
+
+NB Signer modifie le fichier et écrase une signature existante.
+""");
+
+
+        
+        JScrollPane scrollPane = new JScrollPane(tutorialArea);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Tutoriel général"));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        filePanel.add(scrollPane);
+
+        filePanel.add(Box.createVerticalStrut(10));
 
         // Opérations sur la signature
         JPanel buttonPanel = new JPanel();
@@ -311,14 +346,11 @@ public class Projet {
                     Hashs hashFunction = selectHashFunction(selectedHash);
 
                     if (signatureAlgorithm != null && hashFunction != null) {
-                        System.out.println("Algorithme de signature : " + selectedSignature);
-                        System.out.println("Algorithme de hash : " + selectedHash);
 
                         byte[] hashValue;
                         try {
                             hashValue = hashFunction.hash(pdfBytes);
                         } catch (NoSuchAlgorithmException ex) {
-                            ex.printStackTrace();
                             JOptionPane.showMessageDialog(frame,
                                     "Erreur d'algorithme de hachage : " + ex.getMessage(),
                                     "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -326,18 +358,8 @@ public class Projet {
                         }
 
                         BigInteger[] keyPair = updateKey(selectedSignature,  signatureAlgorithm);
-
                         byte[] signature = signatureAlgorithm.sign(hashValue, keyPair);
-
-                        System.out.println("La signature est  : "+ Arrays.toString(signature));
-                        System.out.println("La clé publique est : "+ publicKey[0]);
-
-                        System.out.println("Signature générée : " + new BigInteger(1, signature).toString(16));
-
                         PDFInstance.addMetadata("Signature", signature);
-
-                        boolean isValid = signatureAlgorithm.verify(signature, hashValue, publicKey);
-                        System.out.println("La signature est valide : " + isValid);
 
                         privateKey = null;
                         publicKey = null;
@@ -350,7 +372,6 @@ public class Projet {
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (IOException err) {
-                    err.printStackTrace();
                     JOptionPane.showMessageDialog(frame, "Erreur lors de la lecture du fichier", "Erreur",
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -373,8 +394,6 @@ public class Projet {
                     Hashs hashFunction = selectHashFunction(selectedHash);
 
                     if (signatureAlgorithm != null && hashFunction != null) {
-                        System.out.println("Algorithme de signature : " + selectedSignature);
-                        System.out.println("Algorithme de hash : " + selectedHash);
 
                         updateKey(selectedSignature,  signatureAlgorithm);
 
@@ -387,7 +406,6 @@ public class Projet {
                         try {
                             hashValue = hashFunction.hash(pdfBytes);
                         } catch (NoSuchAlgorithmException ex) {
-                            ex.printStackTrace();
                             JOptionPane.showMessageDialog(frame,
                                     "Erreur d'algorithme de hachage : " + ex.getMessage(),
                                     "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -395,13 +413,10 @@ public class Projet {
                         }
 
                         boolean isValid = signatureAlgorithm.verify(signature, hashValue, publicKey);
-                        System.out.println("La signature est  : "+ Arrays.toString(signature));
-                        System.out.println("La clé publique est : "+ publicKey[0]);
-
                         PDFInstance.addMetadata("Signature", signature);
+                        
                         privateKey = null;
                         publicKey = null;
-                        System.out.println("La signature est valide : " + isValid);
 
                         if(isValid){
                             
@@ -420,7 +435,6 @@ public class Projet {
                     }
 
                 } catch (IOException err) {
-                    err.printStackTrace();
                     JOptionPane.showMessageDialog(frame, "Erreur lors de la lecture du fichier", "Erreur",
                             JOptionPane.ERROR_MESSAGE);
                 }
@@ -429,10 +443,10 @@ public class Projet {
 
         buttonPanel.add(new JLabel("Type de signature :"));
         buttonPanel.add(algoBox);
-        buttonPanel.add(signButton);
-        buttonPanel.add(verifyButton);
         buttonPanel.add(new JLabel("Type de hashage :"));
         buttonPanel.add(hashBox);
+        buttonPanel.add(signButton);
+        buttonPanel.add(verifyButton);
 
         // Ajout des panels au frame
         frame.add(panel, BorderLayout.CENTER);
