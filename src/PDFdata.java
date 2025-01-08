@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -15,13 +16,13 @@ public class PDFdata {
     public void setFile(File file) {
         if (file != null && file.exists()) {
             this.file = file;
-            System.out.println("Defined file : " + file.getAbsolutePath());
+            System.out.println("Defined file: " + file.getAbsolutePath());
         } else {
             System.out.println("Invalid or inexisted file.");
         }
     }
     
-
+    @SuppressWarnings("CallToPrintStackTrace")
     public void addMetadata(String key, byte[] valueBytes) {
         if (this.file == null) {
             System.out.println("Error: No file has been defined. Please call the setFile() function with a valid file.");
@@ -39,6 +40,7 @@ public class PDFdata {
         }
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public byte[] getMetadata(String key) {
         try (PDDocument document = PDDocument.load(file)) {
             PDDocumentInformation info = document.getDocumentInformation();
@@ -54,21 +56,23 @@ public class PDFdata {
         }
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public void displayAllMetadata() {
         try (PDDocument document = PDDocument.load(file)) {
             PDDocumentInformation info = document.getDocumentInformation();
-            System.out.println("File's metadata :");
+            System.out.println("File's metadata:");
             System.out.println("Title: " + info.getTitle());
             System.out.println("Author: " + info.getAuthor());
             System.out.println("Subject: " + info.getSubject());
             System.out.println("Creator: " + info.getCreator());
             System.out.println("Producer: " + info.getProducer());
-            System.out.println("Signature: " + getMetadata("Signature"));
+            System.out.println("Signature: " + Arrays.toString(getMetadata("Signature")));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    @SuppressWarnings("CallToPrintStackTrace")
     public void removeMetadata(String key) {
         try (PDDocument document = PDDocument.load(file)) {
             PDDocumentInformation info = document.getDocumentInformation();
