@@ -1,6 +1,5 @@
 @echo off
 REM Définition des variables
-set SRC_DIR=src
 set BIN_DIR=bin
 set LIB_DIR=lib
 set MAIN_CLASS=SignatureApp
@@ -21,7 +20,8 @@ goto :eof
 
 :compile
 echo Compilation en cours...
-javac -d "%BIN_DIR%" -cp "%LIB_DIR%\*" "%SRC_DIR%\*.java"
+javac -d bin -cp "lib/*" src/*.java
+
 if %ERRORLEVEL% == 0 (
     echo Compilation terminee avec succes.
 ) else (
