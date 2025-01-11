@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PKI {
 
-    private static final String FILENAME = "bin/pki.txt";
+    private static final String FILENAME = "bin/pki.xml";
 
     public static int newUser() {
         try (BufferedWriter buffered = new BufferedWriter(new FileWriter(FILENAME, true))) {
@@ -24,11 +24,6 @@ public class PKI {
                     "        <type>RSA</type>\n" +
                     "        <privateKey>" + null + "," + null + "</privateKey>\n" +
                     "        <publicKey>" + null + "," + null + "</publicKey>\n" +
-                    "    </key>\n" +
-                    "    <key>\n" +
-                    "        <type>BLS</type>\n" +
-                    "        <privateKey>" + null + "</privateKey>\n" +
-                    "        <publicKey>" + null + "</publicKey>\n" +
                     "    </key>\n" +
                     "    <key>\n" +
                     "        <type>ECDSA</type>\n" +
@@ -85,7 +80,7 @@ public class PKI {
             publicKey1 = Utils.bigIntToHex(keys[1]);
             publicKey2 = Utils.bigIntToHex(keys[2]);
         }
-        if (typeKey.equals("BLS") || typeKey.equals("DSA")) {
+        if (typeKey.equals("DSA")) {
             privateKey1 = Utils.bigIntToHex(keys[0]);
             publicKey1 = Utils.bigIntToHex(keys[1]);
         }
